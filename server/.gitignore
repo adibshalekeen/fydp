@@ -1,0 +1,6 @@
+*.pyc
+__pycache__/
+*.class
+*.log
+*-debug.log
+node_modules/
