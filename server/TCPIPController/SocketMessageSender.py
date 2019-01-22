@@ -24,4 +24,6 @@ class SocketMessageSender:
         finally:
             if "CLOSE_CONNECTION" in message:
                 print('closing socket')
+                response = self.sock.recv(256)
+                print(resonse.decode('utf-8'))
                 self.sock.close()
