@@ -1,3 +1,3 @@
-import CentralSocketCtrl as CSC
+import HubMessageServer as HMS
 
-csc = CSC.ChatServer(10000).run()
+hms = HMS.HubMessageServer(10000).run()

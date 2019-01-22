@@ -2,7 +2,7 @@ import socket
 import select
 
 
-class ChatServer:
+class HubMessageServer:
     def __init__( self, port ):
         self.port = port;
 
@@ -13,7 +13,7 @@ class ChatServer:
 
         self.descriptors = []
         self.descriptors.append(self.srvsock)
-        print('ChatServer started on port %s' % port)
+        print('HubMessageServer started on port %s' % port)
 
     def run(self):
             while 1:

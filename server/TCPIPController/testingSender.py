@@ -1,7 +1,7 @@
-import SocketController as SC
+import SocketMessageSender as SMC
 
-controller = SC.SocketController()
+sender = SMC.SocketMessageSender()
 
 while True:
     message = input()
-    controller.send_data(message)
+    sender.send_data(message)
