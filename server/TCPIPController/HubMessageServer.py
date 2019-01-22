@@ -26,7 +26,6 @@ class HubMessageServer:
                     if sock == self.srvsock:
                         self.accept_new_connection()
                     else:
-                        connReset = False
                         # Received something on a client socket
                         try:
                             str = sock.recv(256)
@@ -34,11 +33,11 @@ class HubMessageServer:
                         except ConnectionResetError:
                             print("Connection has been reset")
                             str = b''
-                            connReset = True
+                            sread.remove(sock)
 
 
                         # Check to see if the peer socket closed
-                        if str == b'' && connReset:
+                        if str == b'':
                             str = 'Client left %s:%s\r\n' % (host, port)
                             self.broadcast_string(str.encode(), sock)
                             sock.close
