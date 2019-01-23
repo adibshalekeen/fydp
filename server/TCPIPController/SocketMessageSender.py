@@ -3,6 +3,7 @@ import socket
 
 class SocketMessageSender:
     def __init__(self, ip_address='localhost', port_listening=10000):
+        print("Connecting to %s" % ip_address)
         self.ip_address = ip_address
         self.port = port_listening
 
