@@ -17,16 +17,8 @@ class CSV_Controller:
                                     quoting=csv.QUOTE_MINIMAL)
             filewriter.writerows(routing_entry)
 
-    def get_file_contents(self):
-        file_contents = []
-        with open(self.filename, 'r', newline='') as csvfile:
-            reader = csv.reader(csvfile)
-            for line in reader:
-                file_contents.append(line)
-        return file_contents
-
     def modify_entry(self, new_ip_address, mac_address):
-        file_contents = self.get_file_contents()
+        file_contents = self.__get_file_contents()
 
         for mapping in file_contents:
             if mac_address in mapping[1]:
@@ -34,13 +26,25 @@ class CSV_Controller:
             elif mac_address in mapping[3]:
                 mapping[2] = new_ip_address
 
-        with open(self.filename, 'w', newline='') as csvfile:
-            filewriter = csv.writer(csvfile, delimiter=',',
-                                    quoting=csv.QUOTE_MINIMAL)
-            filewriter.writerows(file_contents)
+        self.__write_to_file(file_contents)
 
     def delete_source_entry(self, ip_source, mac_source):
         pass
 
     def delete_dest_entry(self, ip_dest, mac_dest):
         pass
+
+    # Private functions
+    def __get_file_contents(self):
+        file_contents = []
+        with open(self.filename, 'r', newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            for line in reader:
+                file_contents.append(line)
+        return file_contents
+
+    def __write_to_file(self, file_contents):
+        with open(self.filename, 'w', newline='') as csvfile:
+            filewriter = csv.writer(csvfile, delimiter=',',
+                                    quoting=csv.QUOTE_MINIMAL)
+            filewriter.writerows(file_contents)
