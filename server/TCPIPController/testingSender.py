@@ -10,10 +10,11 @@ while(1):
     print("1. Find network devices")
     print("2. Update mapping of devices")
     print("3. Start sender")
+    print("4. Exit program")
     path = input()
     try:
         num = int(path)
-        if(num > 3 or num < 1):
+        if(num > 4 or num < 1):
             print("Please select a valid option...")
             time.sleep(1)
             continue
@@ -43,7 +44,7 @@ while(1):
             print("5. Exit mapping modification")
             mapAct = input()
             cont = csvCtrl.CSV_Controller()
-            
+
             mapActVal = 0
             try:
                 mapActVal = int(mapAct)
@@ -63,10 +64,10 @@ while(1):
 
                 if mapActVal == 3:
                     deviceMac = input("Enter the Mac address of the device you wish to modify in the form 'AA:55:AA:55:AA:55': ")
-                    deviceIP = input("Enter the new IP address of the device")
+                    deviceIP = input("Enter the new IP address of the device: ")
                     cont.modify_entry(deviceIP, deviceMac)
                 if mapActVal == 2:
-                    mapDelete = input("Select the index of the mapping to delete")
+                    mapDelete = input("Select the index of the mapping to delete: ")
                     try:
                         mapDelVal = int(mapDelete)
                         cont.delete_entry(mapDelVal)
@@ -98,3 +99,6 @@ while(1):
         while not value:
             message = input()
             value = sender.send_data(message)
+
+    elif path == 4:
+        break
