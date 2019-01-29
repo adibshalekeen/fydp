@@ -10,13 +10,14 @@ def find_network_devices(debug=False):
         userIpAddress = re.findall('\s{3}IPv4\sAddress.*(\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', ipconfigResp)
         userIpAddress = userIpAddress[0] + "/24"
     elif os.name == "posix":
-        ipconfigResp = subprocess.run(['sudo', 'ifconfig', 'wlan0'], stdout=subprocess.PIPE)
+        ipconfigResp = subprocess.run(['ifconfig', 'wlan0'], stdout=subprocess.PIPE)
         ipconfigResp = ipconfigResp.stdout.decode('utf-8')
         userIpAddress = re.findall('inet\s(\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', ipconfigResp)
         userIpAddress = userIpAddress[0] + "/24"
 
-    print("Running command \'nmap -sn %s\'" % userIpAddress)
-    response = subprocess.run(['nmap', '-sn', userIpAddress], stdout=subprocess.PIPE)
+    processToRun = (os.name == "posix") ? ['sudo', 'nmap', '-sn', userIpAddress]
+    print("Running command \'%s\'" % processToRun)
+    response = subprocess.run(processToRun, stdout=subprocess.PIPE)
     devices = response.stdout.decode('utf-8')
 
     if debug:
