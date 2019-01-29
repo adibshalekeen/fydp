@@ -36,6 +36,9 @@ class MappingInterfaceCtrl:
         file_contents.pop(int(index))
         self.__write_to_file(file_contents)
 
+    # Can optimize this to use following command to check last edit time for file
+    # file_epoch_time = os.path.getmtime(file)
+    # time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(file_epoch_time))
     def get_mapped_addresses(self, source_ip):
         mapped_addresses = []
         contents = self.get_file_contents()
