@@ -10,7 +10,7 @@ def find_network_devices(debug=False):
         userIpAddress = re.findall('\s{3}IPv4\sAddress.*(\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', ipconfigResp)
         userIpAddress = userIpAddress[0] + "/24"
     elif os.name == "posix":
-        ipconfigResp = subprocess.run(['ifconfig', 'wlan0'], stdout=subprocess.PIPE)
+        ipconfigResp = subprocess.run(['sudo', 'ifconfig', 'wlan0'], stdout=subprocess.PIPE)
         ipconfigResp = ipconfigResp.stdout.decode('utf-8')
         userIpAddress = re.findall('inet\s(\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', ipconfigResp)
         userIpAddress = userIpAddress[0] + "/24"
