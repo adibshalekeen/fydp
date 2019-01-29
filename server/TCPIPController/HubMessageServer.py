@@ -52,7 +52,7 @@ class HubMessageServer:
 
                             #self.broadcast_string(newstr.encode(), sock)
 
-    def send_message(self, dest_ip, dest_port=10000, msg):
+    def send_message(self, dest_ip, msg, dest_port=10000):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((dest_ip, dest_port))
         sock.sendall(msg.encode())
