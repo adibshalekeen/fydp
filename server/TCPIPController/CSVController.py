@@ -29,6 +29,9 @@ class CSV_Controller:
         self.__write_to_file(file_contents)
 
     def delete_entry(self, index):
+        if index == 0:
+            print("[Errror] - Cannot delete the header!\n")
+            return 0
         file_contents = self.get_file_contents()
         file_contents.pop(int(index))
         self.__write_to_file(file_contents)
@@ -43,7 +46,6 @@ class CSV_Controller:
 
     # Private functions
     def __write_to_file(self, file_contents):
-        print(file_contents)
         with open(self.filename, 'w', newline='') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',',
                                     quoting=csv.QUOTE_MINIMAL)
