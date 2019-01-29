@@ -4,7 +4,8 @@ import MappingInterfaceCtrl as mapIfaceCtrl
 
 import time
 
-devices = [["mac 1", "manf 1", "name 1", "ip 1"], ["mac 2", "manf 2", "name 2", "ip 2"], ["mac 3", "manf 3", "name 3", "ip 3"]]
+devices = [["00:22:58:11:88:AE", "Raspberry Pi Foundation", "Victor RPi", "10.161.35.148"],
+            ["F0:6E:0B:DC:78:D0", "Microsoft", "Victors Computer", "10.161.35.17"], ["mac 3", "manf 3", "name 3", "ip 3"]]
 while(1):
     print("What would you like to do?")
     print("1. Find network devices")
@@ -92,8 +93,10 @@ while(1):
                         continue
 
     elif path == 3:
+        for index, device in enumerate(devices):
+            print("%d - IP: %s, Name: %s, MAC: %s, Manufacturer: %s" % (index, device[3], device[2], device[0], device[1]))
         device_to_connect = input("Select the number of a device to connect to:")
-        sender = SMC.SocketMessageSender(ip_address=devices[int(device_to_connect)][2])
+        sender = SMC.SocketMessageSender(ip_address=devices[int(device_to_connect)][3])
         value = 0;
 
         while not value:
