@@ -1,6 +1,6 @@
-import CSVController as csvCtrl
+import MappingInterfaceCtrl as mapIfaceCtrl
 
-cont = csvCtrl.CSV_Controller()
+cont = mapIfaceCtrl.CSV_Controller()
 
 cont.add_entry([["192.168.128.1", "AA:55:AA:55:AA:55", "192.168.128.2", "BB:66:BB:66:BB:66"]])
 

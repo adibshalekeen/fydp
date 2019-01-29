@@ -1,6 +1,6 @@
 import SocketMessageSender as SMC
 import IpDeviceDiscovery as IDD
-import CSVController as csvCtrl
+import MappingInterfaceCtrl as mapIfaceCtrl
 
 import time
 
@@ -43,7 +43,7 @@ while(1):
             print("4. See current mapping")
             print("5. Exit mapping modification")
             mapAct = input()
-            cont = csvCtrl.CSV_Controller()
+            mapCont = mapIfaceCtrl.CSV_Controller()
 
             mapActVal = 0
             try:
@@ -58,19 +58,19 @@ while(1):
             if mapActVal == 5:
                 doMapAct = False
             elif mapActVal == 4 or mapActVal == 3 or mapActVal == 2:
-                contents = cont.get_file_contents()
+                contents = mapCont.get_file_contents()
                 for index, line in enumerate(contents):
                     print(index, line)
 
                 if mapActVal == 3:
                     deviceMac = input("Enter the Mac address of the device you wish to modify in the form 'AA:55:AA:55:AA:55': ")
                     deviceIP = input("Enter the new IP address of the device: ")
-                    cont.modify_entry(deviceIP, deviceMac)
+                    mapCont.modify_entry(deviceIP, deviceMac)
                 if mapActVal == 2:
                     mapDelete = input("Select the index of the mapping to delete: ")
                     try:
                         mapDelVal = int(mapDelete)
-                        cont.delete_entry(mapDelVal)
+                        mapCont.delete_entry(mapDelVal)
                     except ValueError:
                         print("Please enter an integer...")
                         continue
@@ -85,7 +85,7 @@ while(1):
                         sourceIndex = int(source)
                         destIndex = int(dest)
                         print(len(devices))
-                        cont.add_entry([[devices[sourceIndex][3], devices[sourceIndex][0], devices[destIndex][3], devices[destIndex][0]]])
+                        mapCont.add_entry([[devices[sourceIndex][3], devices[sourceIndex][0], devices[destIndex][3], devices[destIndex][0]]])
                     except ValueError:
                         print("Please enter an integer")
                         time.sleep(1)

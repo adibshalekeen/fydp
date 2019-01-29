@@ -35,7 +35,6 @@ class HubMessageServer:
                             str = b''
                             sread.remove(sock)
 
-
                         # Check to see if the peer socket closed
                         if str == b'':
                             str = 'Client left %s:%s\r\n' % (host, port)
@@ -43,13 +42,18 @@ class HubMessageServer:
                             sock.close
                             self.descriptors.remove(sock)
                         else:
-                            newstr = '[%s:%s] %s' % (host, port, str)
-                            self.broadcast_string(newstr, sock)
+                            newstr = '[%s:%s] %s' % (host, port, str.decode('utf-8'))
+                            print(newstr)
+
+                            # Here we will do a lookup to see if the incoming message is any use to us
+                            
+
+                            self.broadcast_string(newstr.encode(), sock)
 
     def broadcast_string( self, str, omit_sock ):
         for sock in self.descriptors:
             if sock != self.srvsock and sock != omit_sock:
-                sock.send(str.encode())
+                sock.send(str)
 
         print(str)
 
@@ -60,4 +64,4 @@ class HubMessageServer:
         str_to_send = "You're connected to the Python chatserver\r\n"
         newsock.send(str_to_send.encode())
         str = 'Client joined %s:%s\r\n' % (remhost, remport)
-        self.broadcast_string(str, newsock)
+        self.broadcast_string(str.encode(), newsock)
