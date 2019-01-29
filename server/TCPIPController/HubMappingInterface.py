@@ -43,7 +43,7 @@ while(1):
             print("4. See current mapping")
             print("5. Exit mapping modification")
             mapAct = input()
-            mapCont = mapIfaceCtrl.CSV_Controller()
+            mapCont = mapIfaceCtrl.MappingInterfaceCtrl()
 
             mapActVal = 0
             try:

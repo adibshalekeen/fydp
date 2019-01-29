@@ -1,18 +1,19 @@
 import MappingInterfaceCtrl as mapIfaceCtrl
 
-cont = mapIfaceCtrl.CSV_Controller()
+cont = mapIfaceCtrl.MappingInterfaceCtrl()
 
-cont.add_entry([["192.168.128.1", "AA:55:AA:55:AA:55", "192.168.128.2", "BB:66:BB:66:BB:66"]])
-
-cont.modify_entry("192.168.128.7", "AA:55:AA:55:AA:55")
-cont.modify_entry("192.168.128.53", "BB:66:BB:66:BB:66")
-
-contents = cont.get_file_contents()
-for index, line in enumerate(contents):
-    print(index, line)
-deleteindex = input("Select one to remove")
-
-cont.delete_entry(deleteindex)
-contents = cont.get_file_contents()
-for index, line in enumerate(contents):
-    print(index, line)
+# cont.add_entry([["192.168.128.1", "AA:55:AA:55:AA:55", "192.168.128.2", "BB:66:BB:66:BB:66"]])
+#
+# cont.modify_entry("192.168.128.7", "AA:55:AA:55:AA:55")
+# cont.modify_entry("192.168.128.53", "BB:66:BB:66:BB:66")
+#
+# contents = cont.get_file_contents()
+# for index, line in enumerate(contents):
+#     print(index, line)
+# deleteindex = input("Select one to remove")
+#
+# cont.delete_entry(deleteindex)
+# contents = cont.get_file_contents()
+# for index, line in enumerate(contents):
+#     print(index, line)
+print(cont.get_mapped_addresses("10.161.35.140"))

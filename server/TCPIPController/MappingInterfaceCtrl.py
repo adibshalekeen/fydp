@@ -1,7 +1,7 @@
 import csv
 import os
 
-class CSV_Controller:
+class MappingInterfaceCtrl:
     def __init__(self, filename = "routing.csv"):
         self.filename = filename
         if not os.path.isfile(self.filename):
@@ -35,6 +35,14 @@ class CSV_Controller:
         file_contents = self.get_file_contents()
         file_contents.pop(int(index))
         self.__write_to_file(file_contents)
+
+    def get_mapped_addresses(self, source_ip):
+        mapped_addresses = []
+        contents = self.get_file_contents()
+        for mapping in contents:
+            if source_ip in mapping:
+                mapped_addresses.append(mapping[2])
+        return mapped_addresses
 
     def get_file_contents(self):
         file_contents = []

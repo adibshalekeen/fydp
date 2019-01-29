@@ -1,6 +1,6 @@
 import socket
 import select
-
+import MappingInterfaceCtrl as mictrl
 
 class HubMessageServer:
     def __init__( self, port ):
@@ -14,6 +14,7 @@ class HubMessageServer:
         self.descriptors = []
         self.descriptors.append(self.srvsock)
         print('HubMessageServer started on port %s' % port)
+        self.mictrl = mictrl.MappingInterfaceCtrl()
 
     def run(self):
             while 1:
@@ -46,9 +47,16 @@ class HubMessageServer:
                             print(newstr)
 
                             # Here we will do a lookup to see if the incoming message is any use to us
-                            
+                            destIp = self.mictrl.get_mapped_addresses(host)
+                            print("got %s" % destIp)
 
-                            self.broadcast_string(newstr.encode(), sock)
+                            #self.broadcast_string(newstr.encode(), sock)
+
+    def send_message(self, dest_ip, dest_port=10000, msg):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((dest_ip, dest_port))
+        sock.sendall(msg.encode())
+        sock.close()
 
     def broadcast_string( self, str, omit_sock ):
         for sock in self.descriptors:
