@@ -15,7 +15,7 @@ def find_network_devices(debug=False):
         userIpAddress = re.findall('inet\s(\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', ipconfigResp)
         userIpAddress = userIpAddress[0] + "/24"
 
-    processToRun = (os.name == "posix") ? ['sudo', 'nmap', '-sn', userIpAddress]
+    processToRun = ['sudo', 'nmap', '-sn', userIpAddress] if os.name == "posix" else ['nmap', '-sn', userIpAddress]
     print("Running command \'%s\'" % processToRun)
     response = subprocess.run(processToRun, stdout=subprocess.PIPE)
     devices = response.stdout.decode('utf-8')
