@@ -1,11 +1,317 @@
-<html>
+<html lang="en">
   <head>
   <meta charset="utf-8">
   <title>C-Star Interface</title>
-  <link rel='stylesheet' href='style.css' />
+  <base href='/'>
+  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" type="text/css" href="./node_modules/perfect-scrollbar/css/perfect-scrollbar.css">
+  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css"/>
   </head>
   <body>
-    <div id='root'></div>
-    <script src='/dist/bundle.js'></script>
+    <div class="top-bar">
+      <a href="#">C* Configuration Interface</a>
+    </div>
+    <div class="content-area">
+
+      <div class="content-table-wrapper">
+        <div class="header-text">Device(s) on the network</div>
+        <div class="table100 ver1 m-b-110">
+          <div class="table100-head">
+            <table class="table-text-format">
+              <thead>
+                <tr>
+                  <th class="table-column">Ip Address</th>
+                  <th class="table-column">Mac Address</th>
+                  <th class="table-column">Device Name</th>
+                  <th class="table-column">Manufacturer Name</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+
+          <div class="table100-body js-pscroll">
+            <table class="table-text-format fixed">
+              <tbody>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">Raspberry Pi</td>
+                  <td class="table-column">Apple Inc.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="main-button">
+          <a href="#">Find Devices</a>
+        </div>
+      </div>
+
+      <div class="content-table-wrapper">
+        <div class="header-text">Device Message Routing</div>
+        <div class="table100 ver1 m-b-110">
+          <div class="table100-head">
+            <table class="table-text-format">
+              <thead>
+                <tr>
+                  <th class="table-column">Source Ip Address</th>
+                  <th class="table-column">Source Mac Address</th>
+                  <th class="table-column">Destination Ip Address</th>
+                  <th class="table-column">Destination Mac Address</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+
+          <div class="table100-body js-pscroll">
+            <table class="table-text-format fixed">
+              <tbody>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">BB:55:BB:55:BB:55</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">BB:55:BB:55:BB:55</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">BB:55:BB:55:BB:55</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">BB:55:BB:55:BB:55</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">BB:55:BB:55:BB:55</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">BB:55:BB:55:BB:55</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">BB:55:BB:55:BB:55</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">AA:44:AA:44:AA:44</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">BB:55:BB:55:BB:55</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="main-button">
+          <a href="#">Load Message Routing</a>
+          <a href="#">Save Message Routing</a>
+        </div>
+      </div>
+
+      <div class="content-table-wrapper">
+        <div class="header-text">Device Action Mapping(s)</div>
+        <div class="table100 ver1 m-b-110">
+          <div class="table100-head">
+            <table class="table-text-format">
+              <thead>
+                <tr>
+                  <th class="table-column">Source Ip Address</th>
+                  <th class="table-column">Source Action</th>
+                  <th class="table-column">Destination Ip Address</th>
+                  <th class="table-column">Destination Action</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+
+          <div class="table100-body js-pscroll">
+            <table class="table-text-format fixed">
+              <tbody>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">GESTURE_HAND_UP</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">LED_5_ON</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">GESTURE_HAND_UP</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">LED_5_ON</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">GESTURE_HAND_UP</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">LED_5_ON</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">GESTURE_HAND_UP</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">LED_5_ON</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">GESTURE_HAND_UP</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">LED_5_ON</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">GESTURE_HAND_UP</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">LED_5_ON</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">GESTURE_HAND_UP</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">LED_5_ON</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">GESTURE_HAND_UP</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">LED_5_ON</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">GESTURE_HAND_UP</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">LED_5_ON</td>
+                </tr>
+                <tr>
+                  <td class="table-column">10.161.121.1</td>
+                  <td class="table-column">GESTURE_HAND_UP</td>
+                  <td class="table-column">10.161.121.2</td>
+                  <td class="table-column">LED_5_ON</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="main-button">
+          <a href="#">Load Action Mapping</a>
+          <a href="#">Save Action Mapping</a>
+        </div>
+      </div>
+      <div class="footer">
+      </div>
+      <!-- <div id='root'></div> -->
+      <script src='/dist/bundle.js'></script>
+      <!-- <div class="main-button">
+        <a href="#">Change config</a>
+      </div> -->
+      <!-- <div class="container">
+        <form id="subscribe" action="" method="get">
+          <div class="row">
+            <div class="col-md-7">
+              <fieldset>
+                <input name="email" type="text" class="form-control" id="email" onfocus="if(this.value == 'Your Email...') { this.value = ''; }" onblur="if(this.value == '') { this.value = 'Your Email...';}" value="Your Email..." required="">
+              </fieldset>
+            </div>
+            <div class="col-md-5">
+              <fieldset>
+                <button type="submit" id="form-submit" class="button">Subscribe Now!</button>
+              </fieldset>
+            </div>
+          </div>
+        </form>
+      </div> -->
+    </div>
+  	<script src="./node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="./node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js"></script>
+  	<script>
+  		$('.js-pscroll').each(function(){
+  			var ps = new PerfectScrollbar(this);
+
+  			$(window).on('resize', function(){
+  				ps.update();
+  			})
+  		});
+  	</script>
   </body>
 </html>
