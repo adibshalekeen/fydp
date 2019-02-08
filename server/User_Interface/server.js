@@ -8,6 +8,7 @@ const morgan = require('morgan');
 //Static Routes
 app.use('/dist', express.static(path.join(__dirname, 'dist')));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/src', express.static(path.join(__dirname, 'src')));
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 
 app.use(morgan('dev')) // logging
