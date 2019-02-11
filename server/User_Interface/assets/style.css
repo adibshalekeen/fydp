@@ -98,6 +98,10 @@ th, td {
 	background-color: rgb(243,210,80, 0.5);
 }
 
+.clicked {
+  background-color: rgb(243,210,80, 0.3) !important;
+}
+
 .table100-head th {
   padding-top: 18px;
   padding-bottom: 18px;
@@ -122,8 +126,10 @@ th, td {
 }
 
 .table100-body {
-  max-height: 215px;
+  max-height: 300px;
+  min-height: 300px;
   overflow: auto;
+  background-color: #349c284a;
 }
 
 
@@ -140,6 +146,10 @@ th, td {
   font-size: 14px;
 	letter-spacing: 1px;
   color: #808080;
+}
+
+.table100.ver1 .table100-body tr {
+  background-color: #ffffff;
 }
 
 .table100.ver1 .table100-body tr:nth-child(even) {
@@ -240,6 +250,7 @@ p {
     border: 0px solid #eee;
 		cursor: pointer;
 }
+
 .main-button button:hover {
 		background-color: #677077;
 		color: #ffffff
@@ -247,6 +258,12 @@ p {
 
 .main-button button:focus {
 	outline: 0;
+}
+
+.disabled_button {
+    color: #00000059 !important;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .footer {

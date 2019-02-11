@@ -3,7 +3,7 @@
   <meta charset="utf-8">
   <title>C-Star Interface</title>
   <base href='/'>
-  <link rel="stylesheet" href="assets/style.css" />
+  <link rel="stylesheet" href="./assets/style.css" />
   <link rel="stylesheet" type="text/css" href="./node_modules/perfect-scrollbar/css/perfect-scrollbar.css">
   <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css"/>
   </head>
@@ -28,58 +28,15 @@
               </thead>
             </table>
           </div>
-
           <div class="table100-body js-pscroll">
             <table class="table-text-format fixed">
-              <tbody>
-                <tr>
-                  <td class="table-column clicked">10.161.121.1</td>
-                  <td class="table-column">AA:44:AA:44:AA:44</td>
-                  <td class="table-column">Raspberry Pi</td>
-                  <td class="table-column">Apple Inc.</td>
-                </tr>
-                <tr>
-                  <td class="table-column">10.161.121.2</td>
-                  <td class="table-column">AA:44:AA:44:AA:44</td>
-                  <td class="table-column">Raspberry Pi</td>
-                  <td class="table-column">Apple Inc.</td>
-                </tr>
-                <tr>
-                  <td class="table-column">10.161.121.3</td>
-                  <td class="table-column">AA:44:AA:44:AA:44</td>
-                  <td class="table-column">Raspberry Pi</td>
-                  <td class="table-column">Apple Inc.</td>
-                </tr>
-                <tr>
-                  <td class="table-column">10.161.121.4</td>
-                  <td class="table-column">AA:44:AA:44:AA:44</td>
-                  <td class="table-column">Raspberry Pi</td>
-                  <td class="table-column">Apple Inc.</td>
-                </tr>
-                <tr>
-                  <td class="table-column">10.161.121.5</td>
-                  <td class="table-column">AA:44:AA:44:AA:44</td>
-                  <td class="table-column">Raspberry Pi</td>
-                  <td class="table-column">Apple Inc.</td>
-                </tr>
-                <tr>
-                  <td class="table-column">10.161.121.6</td>
-                  <td class="table-column">AA:44:AA:44:AA:44</td>
-                  <td class="table-column">Raspberry Pi</td>
-                  <td class="table-column">Apple Inc.</td>
-                </tr>
-                <tr>
-                  <td class="table-column">10.161.121.7</td>
-                  <td class="table-column">AA:44:AA:44:AA:44</td>
-                  <td class="table-column">Raspberry Pi</td>
-                  <td class="table-column">Apple Inc.</td>
-                </tr>
+              <tbody id="device-table">
               </tbody>
             </table>
           </div>
         </div>
         <div class="main-button">
-          <button class="not-selectable-text">Find Devices</button>
+          <button class="find-devices not-selectable-text">Find Devices</button>
         </div>
       </div>
 
@@ -98,23 +55,18 @@
               </thead>
             </table>
           </div>
-
           <div class="table100-body js-pscroll">
             <table class="table-text-format fixed">
-              <tbody>
-                <tr>
-                  <td class="table-column">10.161.121.1</td>
-                  <td class="table-column">AA:44:AA:44:AA:44</td>
-                  <td class="table-column">10.161.121.2</td>
-                  <td class="table-column">BB:55:BB:55:BB:55</td>
-                </tr>
+              <tbody id="mapping-table">
               </tbody>
             </table>
           </div>
         </div>
         <div class="main-button">
-          <button class="not-selectable-text">Load Message Routing</button>
-          <button class="not-selectable-text">Save Message Routing</button>
+          <button class="not-selectable-text add-mapping">Add Routing</button>
+          <button class="not-selectable-text delete-mapping">Delete Routing</button>
+          <button class="not-selectable-text load-mappings">Load Routing</button>
+          <button class="not-selectable-text save-mappings">Save Routing</button>
         </div>
       </div>
 
@@ -133,38 +85,35 @@
               </thead>
             </table>
           </div>
-
-          <div class="table100-body js-pscroll">
+            <div class="table100-body js-pscroll">
             <table class="table-text-format fixed">
-              <tbody>
+              <tbody id="action-table">
                 <tr>
-                  <td class="table-column">10.161.121.1</td>
+                  <!-- <td class="table-column">10.161.121.1</td>
                   <td class="table-column">GESTURE_HAND_UP</td>
                   <td class="table-column">10.161.121.2</td>
-                  <td class="table-column">LED_5_ON</td>
+                  <td class="table-column">LED_5_ON</td> -->
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
         <div class="main-button">
-          <button class="not-selectable-text">Load Action Mapping</button>
-          <button class="not-selectable-text">Save Action Mapping</button>
+          <button class="not-selectable-text add-action">Add Action</button>
+          <button class="not-selectable-text delete-action">Delete Action</button>
+          <button class="not-selectable-text load-actions">Load Actions</button>
+          <button class="not-selectable-text save-actions">Save Actions</button>
         </div>
       </div>
-      <div class="footer">
-      </div>
+      <div class="footer"></div>
 
-    <div id='test'></div>
-    <script src='./src/index.js'></script>
     <script src='/dist/bundle.js'></script>
   	<script src="./node_modules/jquery/dist/jquery.min.js"></script>
-    <script src='/dist/functions.js'></script>
     <script src="./node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js"></script>
+    <script src='/dist/functions.js'></script>
   	<script>
   		$('.js-pscroll').each(function(){
   			var ps = new PerfectScrollbar(this);
-
   			$(window).on('resize', function(){
   				ps.update();
   			})
