@@ -16,5 +16,6 @@ This is the user interface that will be used to configure the device and gesture
 * babel-loader
 * babel-preset-es2015
 * babel-preset-react
+* python-shell
 
 For a quick start guide, follow the instructions here for the dependencies to download but use this repo's code: https://blog.cloudboost.io/how-to-run-a-nodejs-web-server-on-a-raspberry-pi-for-development-3ef9ac0fc02c
