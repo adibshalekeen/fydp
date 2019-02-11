@@ -5,6 +5,12 @@ const path = require('path');
 const chalk = require('chalk');
 const morgan = require('morgan');
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 //Static Routes
 app.use('/dist', express.static(path.join(__dirname, 'dist')));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
@@ -71,4 +77,4 @@ app.get('/', (req, res, next) => res.sendFile(path.join(__dirname, 'index.html')
 
 //Run Server
 const port = 2081;
-app.listen(process.env.PORT || port, () => console.log(chalk.blue(`Listening intently on port ${port}`)));
+app.listen(process.env.PORT || port, "0.0.0.0", () => console.log(chalk.blue(`Listening intently on port ${port}`)));
