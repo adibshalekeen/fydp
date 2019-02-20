@@ -1,8 +1,7 @@
-from imutils.video import VideoStream
 import argparse
 import datetime
-import imutils
 import time
+import imutils
 import cv2
 from scipy.stats import norm
 import numpy as np
@@ -12,7 +11,7 @@ downresScale = 3
 width = 281
 height = 500
 
-class MotionDetector:
+class MotionDetection:
 
     @staticmethod
     def threshold_frame(current, previous, threshold_value = 50):
@@ -28,8 +27,8 @@ class MotionDetector:
 
     @staticmethod
     def get_full_contours(current, previous, channel):
-        thresh = self.threshold_frame(current, previous, 75)
-        output = self.channel_image(thresh, channel)
+        thresh = MotionDetection.threshold_frame(current, previous, 75)
+        output = MotionDetection.channel_image(thresh, channel)
 
         im2, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         new_contours = []
@@ -41,18 +40,18 @@ class MotionDetector:
         x = 0
         y = 0
         if (len(new_contours) > 0):
-            x, y = centroid_from_contours(new_contours)
+            x, y = MotionDetection.centroid_from_contours(new_contours)
 
         cv2.drawContours(output, new_contours, -1, (0,255,0), 1)
         return output, (x, y)
 
     @staticmethod
     def get_approx_contours(current, previous, channel):
-        thresh = self.threshold_frame(current, previous)
+        thresh = MotionDetection.threshold_frame(current, previous)
         contours = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contours = imutils.grab_contours(contours)
 
-        output = self.channel_image(thresh, channel)
+        output = MotionDetection.channel_image(thresh, channel)
 
         filteredContours = []
 
@@ -99,12 +98,12 @@ class MotionDetector:
 
     @staticmethod
     def process_approx_image_contours(frame, previousFrame):
-        red,r_c = self.get_approx_contours(frame[:, :, 0], previousFrame[:, :, 0], 0)
-        green,g_c = self.get_approx_contours(frame[:, :, 1], previousFrame[:, :, 1], 1)
-        blue,b_c = self.get_approx_contours(frame[:, :, 2], previousFrame[:, :, 2], 2)
-        r_c = self.relative_position(frame.shape, r_c)
-        g_c = self.relative_position(frame.shape, g_c)
-        b_c = self.relative_position(frame.shape, b_c)
+        red,r_c = MotionDetection.get_approx_contours(frame[:, :, 0], previousFrame[:, :, 0], 0)
+        green,g_c = MotionDetection.get_approx_contours(frame[:, :, 1], previousFrame[:, :, 1], 1)
+        blue,b_c = MotionDetection.get_approx_contours(frame[:, :, 2], previousFrame[:, :, 2], 2)
+        r_c = MotionDetection.relative_position(frame.shape, r_c)
+        g_c = MotionDetection.relative_position(frame.shape, g_c)
+        b_c = MotionDetection.relative_position(frame.shape, b_c)
         return red,r_c,green,g_c,blue,b_c
 
     @staticmethod
@@ -117,13 +116,13 @@ class MotionDetector:
 
     @staticmethod
     def process_image_contours(frame, previousFrame):
-        red, r_c = self.get_full_contours(frame[:, :, 0], previousFrame[:, :, 0], 0)
-        green, g_c = self.get_full_contours(frame[:, :, 1], previousFrame[:, :, 1], 1)
-        blue, b_c = self.get_full_contours(frame[:, :, 2], previousFrame[:, :, 2], 2)
+        red, r_c = MotionDetection.get_full_contours(frame[:, :, 0], previousFrame[:, :, 0], 0)
+        green, g_c = MotionDetection.get_full_contours(frame[:, :, 1], previousFrame[:, :, 1], 1)
+        blue, b_c = MotionDetection.get_full_contours(frame[:, :, 2], previousFrame[:, :, 2], 2)
 
-        red = self.add_centroid(r_c, red)
-        green = self.add_centroid(g_c, green)
-        blue = self.add_centroid(b_c, blue)
+        red = MotionDetection.add_centroid(r_c, red)
+        green = MotionDetection.add_centroid(g_c, green)
+        blue = MotionDetection.add_centroid(b_c, blue)
         return red, r_c, green, g_c, blue, b_c
 
     @staticmethod
@@ -137,21 +136,21 @@ class MotionDetector:
 
     @staticmethod
     def process_image_threshold(frame, previousFrame):
-        red = threshold_frame(frame[:,:,0], previousFrame[:,:,0])
-        green = threshold_frame(frame[:,:,1],previousFrame[:,:,1])
-        blue = threshold_frame(frame[:,:,2],previousFrame[:,:,2])
+        red = MotionDetection.threshold_frame(frame[:,:,0], previousFrame[:,:,0])
+        green = MotionDetection.threshold_frame(frame[:,:,1],previousFrame[:,:,1])
+        blue = MotionDetection.threshold_frame(frame[:,:,2],previousFrame[:,:,2])
 
-        r_c = centroid(red)
-        g_c = centroid(green)
-        b_c = centroid(blue)
+        r_c = MotionDetection.centroid(red)
+        g_c = MotionDetection.centroid(green)
+        b_c = MotionDetection.centroid(blue)
 
-        red = channel_image(red, 0)
+        red = MotionDetection.channel_image(red, 0)
         if r_c is not None:
             x = int(r_c[0])
             y = int(r_c[1])
             cv2.rectangle(red, (x, y), (x + 5, y + 5), (0, 255, 0), 1)
-        green = channel_image(green, 1)
-        blue = channel_image(blue, 2)
+        green = MotionDetection.channel_image(green, 1)
+        blue = MotionDetection.channel_image(blue, 2)
         return red, green, blue
 
     @staticmethod

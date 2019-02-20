@@ -1,6 +1,8 @@
 from gestures import api
+from gestures import image_processing
 import cv2
 import time
+import numpy as np
 
 first = True 
 def process_frame(frame):
@@ -19,12 +21,12 @@ camera = api.Camera(5,
 frames = []
 firstFrame = None
 
+md = image_processing.MotionDetection
+
 while True:
     stime = time.time()
     fulres = camera.take_picture()
     frame = fulres
-    frame = downResImage(fulres, downresScale)
-    frame = frame if args.get("video", None) is None else frame[1]
     text = "Unoccupied"
 
     # if the frame could not be grabbed, then we have reached the end of the video
@@ -43,23 +45,17 @@ while True:
 
     # red,r_c,green,g_c,blue,b_c = process_approx_image_contours(frame, firstFrame)
     # red, green, blue = process_image_threshold(frame, firstFrame)
-    red,r_c,green,g_c,blue,b_c = process_image_contours(frame, firstFrame)
+    red,r_c,green,g_c,blue,b_c = md.process_image_contours(frame, firstFrame)
 
     # show the frame and record if the user presses a key
     frame_output = frame.copy()
-    a_centroid = average_centroid(r_c, g_c, b_c)
+    a_centroid = md.average_centroid(r_c, g_c, b_c)
     # frame_output = add_centroid(r_c, frame_output, (255,0,0))
     # frame_output = add_centroid(g_c, frame_output, (0,255,0))
     # frame_output = add_centroid(b_c, frame_output, (0,0,255))
-    frame_output = add_centroid(a_centroid, frame_output, (255,255,255))
-    output = make_visual_output(frame_output, red, green, blue)
+    frame_output = md.add_centroid(a_centroid, frame_output, (255,255,255))
+    output = md.make_visual_output(frame_output, red, green, blue)
     cv2.imshow("output", output.astype(np.uint8))
-
-    if (onlyOnce):
-        # if (len(r_c) > 5):
-        #   print("image written to file")
-        #   cv2.imwrite('sample.jpg', imutils.resize(red, width=500))
-        onlyOnce = False
 
     # if the `q` key is pressed, break from the loop
     key = cv2.waitKey(1) & 0xFF
@@ -81,6 +77,4 @@ while True:
     firstFrame = frame
     print('FPS {:.1f}'.format(1 / (time.time() - stime)))
 
-# cleanup the camera and close any open windows
-vs.stop() if args.get("video", None) is None else vs.release()
 cv2.destroyAllWindows()
