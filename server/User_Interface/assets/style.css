@@ -1,0 +1,266 @@
+body {
+	background-color: #2c3531 !important
+}
+
+/*//////////////////////////////////////////////////////////////////
+[ Scroll bar ]*/
+.js-pscroll {
+  position: relative;
+  overflow: hidden;
+}
+
+.table100 .ps__rail-y {
+  width: 9px;
+  background-color: transparent;
+  opacity: 1 !important;
+  right: 5px;
+}
+
+.table100 .ps__rail-y::before {
+  content: "";
+  display: block;
+  position: absolute;
+  background-color: #ebebeb;
+  border-radius: 5px;
+  width: 100%;
+  height: calc(100% - 30px);
+  left: 0;
+  top: 15px;
+}
+
+.table100 .ps__rail-y .ps__thumb-y {
+  width: 100%;
+  right: 0;
+  background-color: transparent;
+  opacity: 1 !important;
+}
+
+.table100 .ps__rail-y .ps__thumb-y::before {
+  content: "";
+  display: block;
+  position: absolute;
+  background-color: #cccccc;
+  border-radius: 5px;
+  width: 100%;
+  height: calc(100% - 30px);
+  left: 0;
+  top: 15px;
+}
+
+
+/*//////////////////////////////////////////////////////////////////*/
+
+.limiter {
+  width: 1366px;
+  margin: 0 auto;
+}
+
+.container-table100 {
+  width: 100%;
+  min-height: 100vh;
+  background: #fff;
+
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 33px 30px;
+}
+
+/*//////////////////////////////////////////////////////////////////*/
+.table100 {
+  background-color: #fff;
+}
+
+table {
+  width: 100%;
+}
+
+th, td {
+  font-weight: unset;
+  padding-right: 10px;
+}
+
+.table-column {
+  width: 25%;
+}
+
+.table-column:hover {
+	background-color: rgb(243,210,80, 0.5);
+}
+
+.clicked {
+  background-color: rgb(243,210,80, 0.3) !important;
+}
+
+.table100-head th {
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.table100-body td {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+/*==================================================================*/
+.table100 {
+  position: relative;
+  padding-top: 60px;
+}
+
+.table100-head {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+.table100-body {
+  max-height: 300px;
+  min-height: 300px;
+  overflow: auto;
+  background-color: #349c284a;
+}
+
+
+/*==================================================================*/
+
+.table100.ver1 th {
+  font-size: 17px;
+	letter-spacing: 1px;
+  color: #ffffff;
+  background-color: #349c28;
+}
+
+.table100.ver1 td {
+  font-size: 14px;
+	letter-spacing: 1px;
+  color: #808080;
+}
+
+.table100.ver1 .table100-body tr {
+  background-color: #ffffff;
+}
+
+.table100.ver1 .table100-body tr:nth-child(even) {
+  background-color: #f8f6ff;
+}
+
+/*---------------------------------------------*/
+
+.table100.ver1 {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -o-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -ms-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+}
+
+.table100.ver1 .ps__rail-y {
+  right: 5px;
+}
+
+.table100.ver1 .ps__rail-y::before {
+  background-color: #ebebeb;
+}
+
+.table100.ver1 .ps__rail-y .ps__thumb-y::before {
+  background-color: #cccccc;
+}
+
+
+body {
+		transition: all 0.5s;
+}
+p {
+		margin-bottom: 0px;
+		font-size: 14px;
+		color: #4a4a4a;
+		line-height: 24px;
+}
+
+.header-text {
+		color: #FFFFFF;
+		font-size: 24;
+		padding-bottom: 0.5rem;
+}
+
+.selected {
+    background-color: brown;
+    color: #FFF;
+}
+
+.content-table-wrapper {
+		padding-left: 20rem;
+		padding-right: 20rem;
+		padding-top: 2rem;
+		padding-bottom: 3rem;
+}
+
+.table-text-format {
+		text-align: center;
+}
+
+.top-bar {
+		font-family: sans-serif;
+	  height: 100px;
+		box-shadow: inset 0px -3px 5px #383d4157;
+}
+
+.not-selectable-text {
+		user-select: none;
+}
+
+.top-bar-text {
+		border-bottom: 3px green solid;
+		font-weight: 500;
+		font-size: 60;
+		letter-spacing: 3px;
+		padding-left: 1rem;
+		display: inherit;
+		color: #ffffff;
+}
+
+.main-button {
+		padding-top: 1rem;
+	  position: relative;
+		float: right;
+}
+
+.main-button button {
+		background-color: #d1e8e2;
+		border-radius: 5px !important;
+		padding: 10px 15px;
+		color: #000000;
+		font-size: 14px;
+		font-weight: 500;
+		text-decoration: none;
+    border: 0px solid #eee;
+		cursor: pointer;
+}
+
+.main-button button:hover {
+		background-color: #677077;
+		color: #ffffff
+}
+
+.main-button button:focus {
+	outline: 0;
+}
+
+.disabled_button {
+    color: #00000059 !important;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.footer {
+		height: 5rem;
+}

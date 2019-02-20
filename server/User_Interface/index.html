@@ -1,0 +1,117 @@
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <title>C-Star Interface</title>
+  <base href='/'>
+  <link rel="stylesheet" href="./assets/style.css" />
+  <link rel="stylesheet" type="text/css" href="./node_modules/perfect-scrollbar/css/perfect-scrollbar.css">
+  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css"/>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="top-bar-text not-selectable-text">C* Configuration</div>
+    </div>
+    <div class="content-area">
+
+      <div class="content-table-wrapper">
+        <div class="header-text not-selectable-text">Device(s) on the Network</div>
+        <div class="table100 ver1">
+          <div class="table100-head">
+            <table class="table-text-format">
+              <thead>
+                <tr>
+                  <th class="table-column not-selectable-text">Ip Address</th>
+                  <th class="table-column not-selectable-text">Mac Address</th>
+                  <th class="table-column not-selectable-text">Device Name</th>
+                  <th class="table-column not-selectable-text">Manufacturer Name</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="table100-body js-pscroll">
+            <table class="table-text-format fixed">
+              <tbody id="device-table">
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="main-button">
+          <button class="find-devices not-selectable-text">Find Devices</button>
+        </div>
+      </div>
+
+      <div class="content-table-wrapper">
+        <div class="header-text not-selectable-text">Device Message Routing(s)</div>
+        <div class="table100 ver1">
+          <div class="table100-head">
+            <table class="table-text-format">
+              <thead>
+                <tr>
+                  <th class="table-column not-selectable-text">Source Ip Address</th>
+                  <th class="table-column not-selectable-text">Source Mac Address</th>
+                  <th class="table-column not-selectable-text">Destination Ip Address</th>
+                  <th class="table-column not-selectable-text">Destination Mac Address</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="table100-body js-pscroll">
+            <table class="table-text-format fixed">
+              <tbody id="mapping-table">
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="main-button">
+          <button class="not-selectable-text add-mapping">Add Routing</button>
+          <button class="not-selectable-text delete-mapping">Delete Routing</button>
+          <button class="not-selectable-text load-mappings">Load Routing</button>
+          <button class="not-selectable-text save-mappings">Save Routing</button>
+        </div>
+      </div>
+
+      <div class="content-table-wrapper">
+        <div class="header-text not-selectable-text">Device Action Mapping(s)</div>
+        <div class="table100 ver1">
+          <div class="table100-head">
+            <table class="table-text-format">
+              <thead>
+                <tr>
+                  <th class="table-column not-selectable-text">Source Ip Address</th>
+                  <th class="table-column not-selectable-text">Source Action</th>
+                  <th class="table-column not-selectable-text">Destination Ip Address</th>
+                  <th class="table-column not-selectable-text">Destination Action</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+            <div class="table100-body js-pscroll">
+            <table class="table-text-format fixed">
+              <tbody id="action-table">
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="main-button">
+          <button class="not-selectable-text add-action">Add Action</button>
+          <button class="not-selectable-text delete-action">Delete Action</button>
+          <button class="not-selectable-text load-actions">Load Actions</button>
+          <button class="not-selectable-text save-actions">Save Actions</button>
+        </div>
+      </div>
+      <div class="footer"></div>
+
+    <script src='/dist/bundle.js'></script>
+  	<script src="./node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="./node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js"></script>
+    <script src='/dist/functions.js'></script>
+  	<script>
+  		$('.js-pscroll').each(function(){
+  			var ps = new PerfectScrollbar(this);
+  			$(window).on('resize', function(){
+  				ps.update();
+  			})
+  		});
+  	</script>
+  </body>
+</html>
