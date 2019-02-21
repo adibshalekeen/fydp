@@ -85,10 +85,6 @@ th, td {
   padding-right: 10px;
 }
 
-.table-column {
-  width: 25%;
-}
-
 .table-column:hover {
 	background-color: rgb(243,210,80, 0.5);
 }
@@ -131,14 +127,16 @@ th, td {
 /*==================================================================*/
 
 .table100.ver1 th {
-  font-size: 17px;
+	width: 16.666%;
+  font-size: 15px;
 	letter-spacing: 1px;
   color: #ffffff;
   background-color: #349c28;
 }
 
 .table100.ver1 td {
-  font-size: 14px;
+	width: 16.666%;
+  font-size: 13px;
 	letter-spacing: 1px;
   color: #808080;
 }
@@ -198,8 +196,8 @@ p {
 }
 
 .content-table-wrapper {
-		padding-left: 20rem;
-		padding-right: 20rem;
+		padding-left: 15rem;
+		padding-right: 15rem;
 		padding-top: 2rem;
 		padding-bottom: 3rem;
 }
