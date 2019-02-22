@@ -29,6 +29,7 @@
     "python-shell": "^1.0.7",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
+    "request": "^2.88.0",
     "webpack": "^3.12.0"
   }
 }
