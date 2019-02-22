@@ -8,8 +8,8 @@ import numpy as np
 
 downresScale = 3
 
-width = 281
-height = 500
+width = 640
+height = 480
 
 class MotionDetection:
 

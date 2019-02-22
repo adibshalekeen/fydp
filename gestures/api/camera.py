@@ -1,6 +1,8 @@
+from picamera.array import PiRGBArray
 from picamera import PiCamera, PiCameraCircularIO
 import time
 import threading
+import io
 import cv2
 import numpy as np
 
@@ -22,13 +24,30 @@ class Camera:
         self._framerate = camera_params["fps"]
         self._camera = PiCamera(resolution=self._resolution, framerate=self._framerate)
         self._pic_out_dir = './' + outdir + '/' + pic_out_dir
-        self._thread = None
+        self._rawCapture = PiRGBArray(self._camera, size=(self._true_resolution[0], self._true_resolution[1]))
         # camera module needs some time twarm up after init
         time.sleep(2)
 
     def take_picture(self):
         if self._camera is not None:
-            frame = np.empty((self._true_resolution[0] * self._true_resolution[1] * 3,), dtype=np.uint8)
-            self._camera.capture(frame, 'bgr')
+            frame = np.zeros((self._true_resolution[0] * self._true_resolution[1] * 3,), dtype=np.uint8)
+            self._camera.capture(frame, 'bgr', use_video_port=True)
             # open cv represents frames as row major so we need to flip the resolutions
             return frame.reshape((self._true_resolution[1], self._true_resolution[0], 3))[:self._resolution[1], :self._resolution[0], :]
+
+    def start_processing(self, func, delta=False):
+        if delta:
+            prev_frame = None
+        for frame in self._camera.capture_continuous(self._rawCapture, format="bgr", use_video_port=True):
+            stime = time.time()
+            image = frame.array
+            if delta and prev_frame is None:
+                prev_frame = image
+                self._rawCapture.truncate(0)
+                continue
+            if delta:
+                func(image, prev_frame)
+                prev_frame = image
+            else:
+                func(image)
+            self._rawCapture.truncate(0)
