@@ -18,26 +18,26 @@ camera = api.Camera(5,
                     camera_params,
                     process_frame)
 
-# frames = []
-# firstFrame = None
-
-# md = image_processing.MotionDetection
-
-def processing(frame, prevframe):
+def processing(fulres, bgSubtractor, all_centroids, count):
     stime = time.time()
-    text = "Unoccupied"
     md = image_processing.MotionDetection
-    height = frame.shape[1]
-    width = frame.shape[0]
 
-    red,r_c,green,g_c,blue,b_c = md.process_image_contours(frame, prevframe)
+    frame = md.downResImage(fulres, 2)
 
-    # show the frame and record if the user presses a key
-    a_centroid = md.average_centroid(r_c, g_c, b_c)
-    frame_output = md.add_centroid(a_centroid, frame, (255,255,255))
-    #output = md.make_visual_output(frame_output, red, green, blue)
-    cv2.imshow("output", frame_output.astype(np.uint8))
-    #cv2.imshow("output", frame)
+    foreground, object_centroid = md.process_image_contours(frame, bgSubtractor)
+
+    frame_output = frame.copy()
+    count, all_centroids = md.add_centroid(all_centroids, object_centroid, count)
+    count, all_centroids, fitted_line = md.test_path(all_centroids, count)
+    # drawing current centroid
+    frame_output = md.add_frame_centroid(object_centroid, frame_output, (255,255,255))
+    # drawing path of centroids
+    md.add_frame_path_centroid(all_centroids, frame_output, (255,255,255))
+    # drawing fitted path
+    md.draw_fitted_path(frame_output, fitted_line)
+    output = md.make_visual_output(False, frame_output)
+    cv2.imshow("output", output.astype(np.uint8))
+
     # if the `q` key is pressed, break from the loop
     key = cv2.waitKey(1) & 0xFF
     print('FPS {:.1f}'.format(1 / (time.time() - stime)))

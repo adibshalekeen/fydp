@@ -36,17 +36,19 @@ class Camera:
             return frame.reshape((self._true_resolution[1], self._true_resolution[0], 3))[:self._resolution[1], :self._resolution[0], :]
 
     def start_processing(self, func, delta=False):
+        bgSubtractor = cv2.createBackgroundSubtractorMOG2(history=1)
+        all_centroids = np.array([[[], []]])
+        count = 10
         if delta:
             prev_frame = None
         for frame in self._camera.capture_continuous(self._rawCapture, format="bgr", use_video_port=True):
-            stime = time.time()
             image = frame.array
             if delta and prev_frame is None:
                 prev_frame = image
                 self._rawCapture.truncate(0)
                 continue
             if delta:
-                func(image, prev_frame)
+                func(image, bgSubtractor, all_centroids, count)
                 prev_frame = image
             else:
                 func(image)
