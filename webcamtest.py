@@ -1,4 +1,3 @@
-from imutils.video import VideoStream
 from gestures import image_processing
 import argparse
 import datetime
@@ -10,7 +9,7 @@ import numpy as np
 
 downresScale = 3
 
-vs = VideoStream(src=0).start()
+vs = cv2.VideoCapture(0)
 time.sleep(2.0)
 
 all_centroids = np.array([[[], []]])
@@ -34,7 +33,7 @@ selected_parameter = mdp.timeout
 
 while True:
     stime = time.time()
-    fulres = vs.read()
+    fulres = vs.read()[1]
     frame = fulres
     frame = md.downResImage(fulres, downresScale)
 
@@ -42,8 +41,10 @@ while True:
         frame, bgSubtractor, downresScale)
 
     frame_output = fulres.copy()
+
     count, all_centroids = md.add_centroid(
         all_centroids, object_centroid, count, params[mdp.timeout])
+
     count, all_centroids, fitted_line = md.test_path(
         all_centroids,
         count, params[mdp.timeout],
@@ -78,5 +79,5 @@ while True:
     # print('FPS {:.1f}'.format(1 / (time.time() - stime)))
 
 # cleanup the camera and close any open windows
-vs.stop()
+vs.release()
 cv2.destroyAllWindows()

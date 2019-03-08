@@ -18,28 +18,56 @@ camera = api.Camera(5,
                     camera_params,
                     process_frame)
 
-def processing(fulres, bgSubtractor, all_centroids, count):
+def processing(fulres, bgSubtractor, all_centroids, count, params, selected_param):
+    downresScale = 2
     stime = time.time()
     md = image_processing.MotionDetection
+    mdp = image_processing.MotionDetectionParameter
 
-    frame = md.downResImage(fulres, 2)
-
-    foreground, object_centroid = md.process_image_contours(frame, bgSubtractor)
+    frame = md.downResImage(fulres, downresScale)
+    ###################################################################
+    foreground, object_centroid = md.process_image_contours(
+        frame, bgSubtractor, downresScale)
 
     frame_output = frame.copy()
-    count, all_centroids = md.add_centroid(all_centroids, object_centroid, count)
-    count, all_centroids, fitted_line = md.test_path(all_centroids, count)
-    # drawing current centroid
-    frame_output = md.add_frame_centroid(object_centroid, frame_output, (255,255,255))
-    # drawing path of centroids
-    md.add_frame_path_centroid(all_centroids, frame_output, (255,255,255))
-    # drawing fitted path
+
+    count, all_centroids = md.add_centroid(
+        all_centroids, object_centroid, count, params[mdp.timeout])
+
+    count, all_centroids, fitted_line = md.test_path(
+        all_centroids,
+        count, params[mdp.timeout],
+        params[mdp.max_len],
+        params[mdp.min_len])
+
+    frame_output = md.add_frame_centroid(
+        object_centroid, frame_output, (255, 255, 255))
+    md.add_frame_path_centroid(all_centroids, frame_output, (255, 255, 255))
     md.draw_fitted_path(frame_output, fitted_line)
-    output = md.make_visual_output(False, frame_output)
+    output = md.make_visual_output(True, frame_output)
+    md.showconfig(output, selected_param, params)
     cv2.imshow("output", output.astype(np.uint8))
+
+    if (fitted_line[0] is not None):
+        params[mdp.path], params[mdp.angle], params[mdp.path_encoding] = md.get_fitted_path_stat(frame_output, fitted_line)
+        print(params)
+    #################################################################
 
     # if the `q` key is pressed, break from the loop
     key = cv2.waitKey(1) & 0xFF
+    if key == ord('1'):
+        selected_param = mdp.timeout
+    if key == ord('2'):
+        selected_param = mdp.max_len
+    if key == ord('3'):
+        selected_param = mdp.min_len
+    if key == ord('='):
+        params[selected_param] += 1
+    if key == ord('-'):
+        params[selected_param] -= 1
+
+    params[mdp.fps] = int(1 / (time.time() - stime))
     print('FPS {:.1f}'.format(1 / (time.time() - stime)))
+    return all_centroids, count, params, selected_param
 
 camera.start_processing(processing, delta=True)

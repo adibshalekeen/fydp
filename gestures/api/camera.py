@@ -5,6 +5,7 @@ import threading
 import io
 import cv2
 import numpy as np
+from gestures import image_processing
 
 class Camera:
     def __init__(self,
@@ -36,9 +37,21 @@ class Camera:
             return frame.reshape((self._true_resolution[1], self._true_resolution[0], 3))[:self._resolution[1], :self._resolution[0], :]
 
     def start_processing(self, func, delta=False):
+        mdp = image_processing.MotionDetectionParameter
+        params = {
+            mdp.fps: 0,
+            mdp.timeout: 10,
+            mdp.max_len: 70,
+            mdp.min_len: 5,
+            mdp.path: (None, None),
+            mdp.angle: None,
+            mdp.path_encoding: None
+        }
+        selected_param = mdp.timeout
         bgSubtractor = cv2.createBackgroundSubtractorMOG2(history=1)
         all_centroids = np.array([[[], []]])
         count = 10
+
         if delta:
             prev_frame = None
         for frame in self._camera.capture_continuous(self._rawCapture, format="bgr", use_video_port=True):
@@ -48,7 +61,7 @@ class Camera:
                 self._rawCapture.truncate(0)
                 continue
             if delta:
-                func(image, bgSubtractor, all_centroids, count)
+                all_centroids, count, params, selected_param = func(image, bgSubtractor, all_centroids, count, params, selected_param)
                 prev_frame = image
             else:
                 func(image)
