@@ -7,7 +7,7 @@ from scipy.stats import norm
 import numpy as np
 from enum import Enum
 
-class MotionDetectionParameter(Enum):
+class MotionDetectionParameter():
     fps = 0
     timeout = 1
     max_len = 2
@@ -16,11 +16,16 @@ class MotionDetectionParameter(Enum):
     angle = 5
     path_encoding = 6
 
-    def describe(self):
-        return self.name, self.value
-    
-    def __str__(self):
-        return '{0}'.format(self.name)
+    gesture_map = {10:"Up", 
+                   11:"Top Right",
+                   12:"Right",
+                   13:"Bottom Right",
+                   14:"Down",
+                   20:"Up",
+                   21:"Top Left",
+                   22:"Left",
+                   23:"Bottom Left",
+                   24:"Down"}
 
 class MotionDetection:
 
@@ -67,9 +72,9 @@ class MotionDetection:
         count = 0
         for c in contours:
             count += c.shape[0]
-            sum = np.sum(c, axis=0)
-            x_sum += sum[0, 0]
-            y_sum += sum[0, 1]
+            vextex_sum = np.sum(c, axis=0)
+            x_sum += vextex_sum[0, 0]
+            y_sum += vextex_sum[0, 1]
         return int(x_sum / count), int(y_sum / count)
 
     @staticmethod
@@ -187,7 +192,6 @@ class MotionDetection:
         x_2 = int(fitted_line[1][0]*w)
         y_2 = int(fitted_line[1][1]*h)
         cv2.line(frame, (x_1, y_1), (x_2, y_2), color, int(np.ceil(h/150)))
-
 
     @staticmethod
     def get_fitted_path_stat(frame, fitted_line):

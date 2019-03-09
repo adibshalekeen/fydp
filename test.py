@@ -3,8 +3,14 @@ from gestures import image_processing
 import cv2
 import time
 import numpy as np
+import imutils
+import requests
 
-first = True 
+first = True
+ip = "http://192.168.0.54:"
+port = "2081/sendMeMessage"
+url = ip + port
+http_params = {'gesture': None}
 def process_frame(frame):
     if first:
         first_frame = frame
@@ -44,12 +50,14 @@ def processing(fulres, bgSubtractor, all_centroids, count, params, selected_para
         object_centroid, frame_output, (255, 255, 255))
     md.add_frame_path_centroid(all_centroids, frame_output, (255, 255, 255))
     md.draw_fitted_path(frame_output, fitted_line)
-    output = md.make_visual_output(True, frame_output)
-    md.showconfig(output, selected_param, params)
-    cv2.imshow("output", output.astype(np.uint8))
-
+    #output = md.make_visual_output(True, frame_output)
+    md.showconfig(frame_output, selected_param, params)
+    cv2.imshow("output", frame_output)
+    
     if (fitted_line[0] is not None):
         params[mdp.path], params[mdp.angle], params[mdp.path_encoding] = md.get_fitted_path_stat(frame_output, fitted_line)
+        gesture = mdp.gesture_map[params[mdp.path_encoding]]
+        requests.post(url=url, data=gesture + "|555")
         print(params)
     #################################################################
 
