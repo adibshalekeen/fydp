@@ -6,89 +6,54 @@ import cv2
 from scipy.stats import norm
 import numpy as np
 
-downresScale = 3
+downresScale = 2
 
-width = 281
-height = 500
+GESTURE_TIMEOUT = 10
+GESTURE_MAX_LENGTH = 70
+GESTURE_MIN_LENGTH = 5
 
 class MotionDetection:
 
     @staticmethod
-    def threshold_frame(current, previous, threshold_value = 50):
-        # ksize = 3
-        # currentBlurred = cv2.GaussianBlur(current, (ksize, ksize), 0)
-        # previousBlurred = cv2.GaussianBlur(previous, (ksize, ksize), 0)
-        # delta = cv2.absdiff(previousBlurred, currentBlurred)
-        delta = cv2.absdiff(current, previous)
-        image_thresh = cv2.threshold(delta, threshold_value, 255, cv2.THRESH_BINARY)[1]
-        # thresh = cv2.dilate(thresh, None, iterations=1)
-        # thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
-        return image_thresh
+    def remove_background(frame, subtractor):
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
+        fgmask = subtractor.apply(frame)
+        return cv2.morphologyEx(fgmask, cv2.MORPH_ELLIPSE, kernel)
 
     @staticmethod
-    def get_full_contours(current, previous, channel):
-        thresh = MotionDetection.threshold_frame(current, previous, 75)
-        output = MotionDetection.channel_image(thresh, channel)
+    def get_full_contours(current_frame, subtractor):
+	    foreground = MotionDetection.remove_background(current_frame, subtractor)
+	    output = MotionDetection.channel_image(foreground, 0)
 
-        im2, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        new_contours = []
-        if len(contours) > 0:
-            for i in range(0, len(contours)):
-                area = cv2.contourArea(contours[i])
-                if cv2.contourArea(contours[i]) > (750 / (2 ** (downresScale + 2))):
-                    new_contours.append(contours[i])
-        x = 0
-        y = 0
-        if (len(new_contours) > 0):
-            x, y = MotionDetection.centroid_from_contours(new_contours)
+	    contours = cv2.findContours(foreground.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[1]
+	    new_contours = []
+	    if len(contours) > 0:
+		    for i in range(0, len(contours)):
+			    if cv2.contourArea(contours[i]) > (20000 / (2 ** (downresScale + 2))):
+				    new_contours.append(contours[i])
+	    x = 0
+	    y = 0
+	    height = foreground.shape[0]
+	    width = foreground.shape[1]
+	    if (len(new_contours) > 0):
+		    c = MotionDetection.centroid_from_contours(new_contours)
+		    x = c[0]/width
+		    y = c[1]/height
 
-        cv2.drawContours(output, new_contours, -1, (0,255,0), 1)
-        return output, (x, y)
-
-    @staticmethod
-    def get_approx_contours(current, previous, channel):
-        thresh = MotionDetection.threshold_frame(current, previous)
-        contours = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        contours = imutils.grab_contours(contours)
-
-        output = MotionDetection.channel_image(thresh, channel)
-
-        filteredContours = []
-
-        for c in contours:
-            # if the contour is too small, ignore
-            if cv2.contourArea(c) < 1000 / (2 ** (downresScale + 2)):
-                continue
-            # compute the bounding box for the contour, draw it on the frame
-            (x, y, w, h) = cv2.boundingRect(c)
-            filteredContours.append(cv2.boundingRect(c))
-            # cv2.rectangle(output, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-        return output, filteredContours
-
-    @staticmethod
-    def relative_position(frameShape, contours):
-        f_h = frameShape[0]
-        f_w = frameShape[1]
-        i = 0
-        while i < len(contours): 
-            # (x, y, w, h)
-            c = contours[i]
-            contours[i] = (c[0]/f_w, c[1]/f_h, c[2]/f_w, c[3]/f_h)
-            i = i + 1
-        return contours
+	    cv2.drawContours(output, new_contours, -1, (0,255,0), 1)
+	    return output, (x, y)
 
     @staticmethod
     def centroid_from_contours(contours):
-        x_sum = 0
-        y_sum = 0
-        count = 0
-        for c in contours:
-            count += c.shape[0]
-            sum = np.sum(c, axis=0)
-            x_sum += sum[0, 0]
-            y_sum += sum[0, 1]
-        return int(x_sum / count), int(y_sum / count)
+	    x_sum = 0
+	    y_sum = 0
+	    count = 0
+	    for c in contours:
+		    count += c.shape[0]
+		    sum = np.sum(c, axis=0)
+		    x_sum += sum[0, 0]
+		    y_sum += sum[0, 1]
+	    return int(x_sum / count), int(y_sum / count)
 
     @staticmethod
     def channel_image(frame, channel):
@@ -97,33 +62,31 @@ class MotionDetection:
         return output
 
     @staticmethod
-    def process_approx_image_contours(frame, previousFrame):
-        red,r_c = MotionDetection.get_approx_contours(frame[:, :, 0], previousFrame[:, :, 0], 0)
-        green,g_c = MotionDetection.get_approx_contours(frame[:, :, 1], previousFrame[:, :, 1], 1)
-        blue,b_c = MotionDetection.get_approx_contours(frame[:, :, 2], previousFrame[:, :, 2], 2)
-        r_c = MotionDetection.relative_position(frame.shape, r_c)
-        g_c = MotionDetection.relative_position(frame.shape, g_c)
-        b_c = MotionDetection.relative_position(frame.shape, b_c)
-        return red,r_c,green,g_c,blue,b_c
-
-    @staticmethod
-    def add_centroid(centroid, frame, color=(0,255,0)):
-        x = int(centroid[0])
-        y = int(centroid[1])
-        if x > 0 and y > 0: 
-            cv2.rectangle(frame, (x, y), (x + 10, y + 10), color, 1)
+    def add_frame_centroid(centroid, frame, color=(0, 255, 0)):
+        height = frame.shape[0]
+        width = frame.shape[1]
+        x = int(centroid[0]*width)
+        y = int(centroid[1]*height)
+        if x > 0 and y > 0:
+            cv2.rectangle(frame, (x, y), (x + int(height/15), y +
+                                          int(height/15)), color, int(height/150))
         return frame
+            
+    @staticmethod
+    def add_frame_path_centroid(centroids, frame, color=(0,255,0)):
+    	height = frame.shape[0]
+    	width = frame.shape[1]
+    	if len(centroids[0][0]) < 1:
+    		return
+    	for i in range(1, len(centroids[0][0])):
+    		previous = (int(centroids[0][0][i - 1]*width), int(centroids[0][1][i - 1]*height))
+    		current = (int(centroids[0][0][i]*width), int(centroids[0][1][i]*height))
+    		cv2.line(frame, previous, current, color, int(np.ceil(height/150)))
 
     @staticmethod
-    def process_image_contours(frame, previousFrame):
-        red, r_c = MotionDetection.get_full_contours(frame[:, :, 0], previousFrame[:, :, 0], 0)
-        green, g_c = MotionDetection.get_full_contours(frame[:, :, 1], previousFrame[:, :, 1], 1)
-        blue, b_c = MotionDetection.get_full_contours(frame[:, :, 2], previousFrame[:, :, 2], 2)
-
-        red = MotionDetection.add_centroid(r_c, red)
-        green = MotionDetection.add_centroid(g_c, green)
-        blue = MotionDetection.add_centroid(b_c, blue)
-        return red, r_c, green, g_c, blue, b_c
+    def process_image_contours(frame, subtractor):
+	    frame_result, centroid = MotionDetection.get_full_contours(frame, subtractor)
+	    return frame_result, centroid
 
     @staticmethod
     def centroid(thresh):
@@ -135,59 +98,74 @@ class MotionDetection:
         return None
 
     @staticmethod
-    def process_image_threshold(frame, previousFrame):
-        red = MotionDetection.threshold_frame(frame[:,:,0], previousFrame[:,:,0])
-        green = MotionDetection.threshold_frame(frame[:,:,1],previousFrame[:,:,1])
-        blue = MotionDetection.threshold_frame(frame[:,:,2],previousFrame[:,:,2])
-
-        r_c = MotionDetection.centroid(red)
-        g_c = MotionDetection.centroid(green)
-        b_c = MotionDetection.centroid(blue)
-
-        red = MotionDetection.channel_image(red, 0)
-        if r_c is not None:
-            x = int(r_c[0])
-            y = int(r_c[1])
-            cv2.rectangle(red, (x, y), (x + 5, y + 5), (0, 255, 0), 1)
-        green = MotionDetection.channel_image(green, 1)
-        blue = MotionDetection.channel_image(blue, 2)
-        return red, green, blue
-
-    @staticmethod
     def downResImage(frame, i): 
         if i == 0:
             return frame
         else:
-            return cv2.pyrDown(downResImage(frame, i-1))
+            return cv2.pyrDown(MotionDetection.downResImage(frame, i-1))
+    
+    @staticmethod
+    def make_visual_output(resizeFrame=True, *args):
+	    h = None
+	    w = None
+	    if len(args) < 0:
+		    return
+	    dimension = int(np.ceil(len(args)**0.5))
+	    out = np.array([])
+	    for i in range(0, len(args)):
+		    frame = None
+		    if resizeFrame:
+			    frame = imutils.resize(args[i], width=500)
+		    else:
+			    frame = args[i]
+		    if h is None:
+			    h = frame.shape[0]
+			    w = frame.shape[1]
+			    out = np.ones((h*dimension, w*dimension, 3)) * 255
+
+		    row = int(np.floor(i / dimension))
+		    column = i % dimension
+		    out[row*h:(row+1)*h, column*w:(column+1)*w, :] = frame
+	    return out
 
     @staticmethod
-    def make_visual_output(frame, red, green, blue):
-        frame = imutils.resize(frame, width=500)
-        red = imutils.resize(red, width=500)
-        green = imutils.resize(green, width=500)
-        blue = imutils.resize(blue, width=500)
-        out_h = red.shape[1]
-        out_w = red.shape[0]
-        out = np.zeros((out_w * 2, out_h * 2, 3))
-        out[0:out_w, 0:out_h] = frame
-        out[0:out_w, out_h:2*out_h, :] = red
-        out[out_w:2*out_w, 0:out_h, :] = green
-        out[out_w:2*out_w, out_h:2*out_h, :] = blue
-        return out
+    def add_centroid(centroids, centroid, count):
+	    if centroid[0] != 0 and centroid[1] != 0:
+		    x = np.concatenate((centroids[0][0], np.array([centroid[0]])))
+		    y = np.concatenate((centroids[0][1], np.array([centroid[1]])))
+		    centroids = np.array([[x,y]])
+		    count = GESTURE_TIMEOUT
+	    else: 
+		    count -= 1
+	    return count, centroids
 
     @staticmethod
-    def average_centroid(*args):
-        if len(args) == 0:
-            return 0, 0
-        sum_x = 0
-        sum_y = 0
-        count = 0
-        for c in args:
-            if c[0] == 0 and c[1] == 0:
-                continue
-            sum_x += c[0]
-            sum_y += c[1]
-            count += 1
-        if count == 0: 
-            return 0, 0
-        return int(sum_x / count), int(sum_y / count)
+    def test_path(centroids, count):
+    	point1 = None
+    	point2 = None
+    	if len(centroids) > GESTURE_MAX_LENGTH or count < 0:
+    		x = centroids[0][0]
+    		y = centroids[0][1]
+    		if len(x) > GESTURE_MIN_LENGTH and len(y) > GESTURE_MIN_LENGTH:
+    			x_1 = x[0]
+    			x_2 = x[len(x) - 1]
+    			z = np.polyfit(x,y,1)
+    			y_1 = z[0]*x_1 + z[1]
+    			y_2 = z[0]*x_2 + z[1]
+    			point1 = (x_1, y_1)
+    			point2 = (x_2, y_2)
+    		return GESTURE_TIMEOUT, np.array([[[], []]]), (point1,point2)
+    	return count, centroids, (point1, point2)
+
+    @staticmethod
+    def draw_fitted_path(frame, fitted_line, color=[0,255,0]):
+    	if fitted_line[0] is None or fitted_line[1] is None:
+    		return
+    	h = frame.shape[0]
+    	w = frame.shape[1]
+    	x_1 = int(fitted_line[0][0]*w)
+    	y_1 = int(fitted_line[0][1]*h)
+    	x_2 = int(fitted_line[1][0]*w)
+    	y_2 = int(fitted_line[1][1]*h)
+    	cv2.line(frame, (x_1,y_1), (x_2, y_2), color, 2)
+
