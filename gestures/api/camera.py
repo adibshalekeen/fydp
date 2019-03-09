@@ -5,7 +5,6 @@ import multiprocessing
 import io
 import cv2
 import numpy as np
-from gestures import image_processing
 
 class CameraWorkerProcess(multiprocessing.Process):
     def __init__(self, task_queue):

@@ -1,5 +1,5 @@
 from gestures import api
-from gestures import image_processing
+from gestures.image_processing import MotionDetection, MotionDetectionParameter
 import cv2
 import time
 import numpy as np
@@ -21,14 +21,20 @@ camera_params = {
 camera = api.Camera(5,
                     camera_params)
 
-mdp = image_processing.MotionDetectionParameter
+mdp = MotionDetectionParameter
 
 persistent_args = {
     "bgSubtractor": cv2.createBackgroundSubtractorMOG2(history=1),
     "all_centroids": np.array([[[], []]]),
-    "params": {mdp.fps: 0, mdp.timeout: 10, mdp.max_len: 70, mdp.min_len: 5, mdp.path: (None, None), mdp.angle: None, mdp.path_encoding: None},
+    "params": {MotionDetectionParameter.fps: 0,
+               MotionDetectionParameter.timeout: 10,
+               MotionDetectionParameter.max_len: 70,
+               MotionDetectionParameter.min_len: 5,
+               MotionDetectionParameter.path: (None, None),
+               MotionDetectionParameter.angle: None,
+               MotionDetectionParameter.path_encoding: None},
     "count": 10,
-    "selected_param": image_processing.MotionDetectionParameter.timeout
+    "selected_param": MotionDetectionParameter.timeout
 }
 
 def show_camera_output(frame, **kwargs):
@@ -38,11 +44,11 @@ def show_camera_output(frame, **kwargs):
     selected_param = kwargs["selected_param"]
     params = kwargs["params"]
 
-    frame = image_processing.MotionDetection.add_frame_centroid(
+    frame = MotionDetection.add_frame_centroid(
         object_centroid, frame, (255, 255, 255))
-    image_processing.MotionDetection.add_frame_path_centroid(all_centroids, frame, (255, 255, 255))
-    image_processing.MotionDetection.draw_fitted_path(frame, fitted_line)
-    image_processing.MotionDetection.showconfig(frame, selected_param, params)
+    MotionDetection.add_frame_path_centroid(all_centroids, frame, (255, 255, 255))
+    MotionDetection.draw_fitted_path(frame, fitted_line)
+    MotionDetection.showconfig(frame, selected_param, params)
 
 def update_func(new_vals, args):
     args["all_centroids"] = new_vals[0]
@@ -59,26 +65,23 @@ def processing_func(fulres, tasks, args):
 
     downresScale = 2
     stime = time.time()
-    md = image_processing.MotionDetection
-    mdp = image_processing.MotionDetectionParameter
+    frame = MotionDetection.downResImage(fulres, downresScale)
 
-    frame = md.downResImage(fulres, downresScale)
-
-    foreground, object_centroid = md.process_image_contours(
+    foreground, object_centroid = MotionDetection.process_image_contours(
         frame, bgSubtractor, downresScale)
 
-    count, all_centroids = md.add_centroid(
-        all_centroids, object_centroid, count, params[mdp.timeout])
+    count, all_centroids = MotionDetection.add_centroid(
+        all_centroids, object_centroid, count, params[MotionDetectionParameter.timeout])
 
-    count, all_centroids, fitted_line = md.test_path(
+    count, all_centroids, fitted_line = MotionDetection.test_path(
         all_centroids,
-        count, params[mdp.timeout],
-        params[mdp.max_len],
-        params[mdp.min_len])
+        count, params[MotionDetectionParameter.timeout],
+        params[MotionDetectionParameter.max_len],
+        params[MotionDetectionParameter.min_len])
 
     if (fitted_line[0] is not None):
-            params[mdp.path], params[mdp.angle], params[mdp.path_encoding] = md.get_fitted_path_stat(fulres, fitted_line)
-            gesture = mdp.gesture_map[params[mdp.path_encoding]]
+            params[MotionDetectionParameter.path], params[MotionDetectionParameter.angle], params[MotionDetectionParameter.path_encoding] = md.get_fitted_path_stat(fulres, fitted_line)
+            gesture = MotionDetectionParameter.gesture_map[params[MotionDetectionParameter.path_encoding]]
             # try:
             #     requests.post(url=url, data=gesture + "|555")
             # except Exception:
@@ -93,7 +96,7 @@ def processing_func(fulres, tasks, args):
                                    selected_param=selected_param,
                                    params=params))
     
-    params[mdp.fps] = int(1 / (time.time() - stime))
+    params[MotionDetectionParameter.fps] = int(1 / (time.time() - stime))
     print('FPS {:.1f}'.format(1 / (time.time() - stime)))
     return all_centroids, count, params, selected_param
 
