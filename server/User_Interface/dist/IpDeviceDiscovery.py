@@ -11,7 +11,7 @@ def find_network_devices(debug=False):
     if os.name == "nt":
         ipconfigResp = subprocess.run(['ipconfig'], stdout=subprocess.PIPE)
         ipconfigResp = ipconfigResp.stdout.decode('utf-8')
-        userIpAddress = re.findall('\s{3}IPv4\sAddress.*(\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', ipconfigResp)
+        userIpAddress = re.findall('\s{3}IPv4\sAddress.*\s(\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', ipconfigResp)
         userIpAddress = userIpAddress[0] + "/24"
     elif os.name == "posix":
         ipconfigResp = subprocess.run(['ifconfig', 'wlan0'], stdout=subprocess.PIPE)
@@ -30,10 +30,11 @@ def find_network_devices(debug=False):
     # Returned console output from the nmap command
     devices = response.stdout.decode('utf-8')
 
+    # Regular expression to capture IP address, MAC address, Device name and Manufacturer
+    ip_addresses = re.findall('Nmap.*for\s([a-zA-Z0-9\(\)\s\.\-\'\_]*\s)?.*(\d{3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*\n.*\n.*?:\s(.*?)\s\(([a-zA-Z0-9\(\)\s\.\-\']*?)\)', devices)
+
     if debug:
         for ip in ip_addresses:
             print(ip)
 
-    # Regular expression to capture IP address, MAC address, Device name and Manufacturer
-    ip_addresses = re.findall('Nmap.*for\s([a-zA-Z0-9.\-]*)\s.*(\d{2,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*\n.*\n.*?:\s(.*?)\s\(([a-zA-Z0-9\(\)\s]*)\)', devices)
     return ip_addresses

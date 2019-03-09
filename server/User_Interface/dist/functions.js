@@ -146,26 +146,26 @@ function display_devices()
   displayElapsedTime();
   document.getElementById("device-table").innerHTML = "";
   thisClass.addClass('disabled_button');
-  var items = ["10.20.138.31", "24:18:1D:5C:67:7D", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown", "10.20.138.35", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown"];
-  // var items = [];
-  // $.ajax({
-  //   url:"http://localhost:2081/getDevices",
-  //   type: "GET",
-  //   success: function(items){
-      thisClass.removeClass('disabled_button');
-      make_table(items, "device-table", false);
-      clearInterval(searchTimeElapsed);
+  //var items = ["10.20.138.31", "24:18:1D:5C:67:7D", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown", "10.20.138.35", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown"];
+  var items = [];
+  $.ajax({
+    url:"http://localhost:2081/getDevices",
+    type: "GET",
+    success: function(items){
+       thisClass.removeClass('disabled_button');
+       make_table(items, "device-table", false);
+       clearInterval(searchTimeElapsed);
 
-      var clickable_items = document.getElementsByClassName('auto-add');
-      for (var i = 0; i < clickable_items.length; i++) {
+       var clickable_items = document.getElementsByClassName('auto-add');
+       for (var i = 0; i < clickable_items.length; i++) {
           clickable_items[i].addEventListener('dblclick', autoAdd, false);
-      }
-      document.getElementsByClassName("update-saved-devices")[0].classList.remove("disabled_button");
-    // },
-    // error: function(err){
-    //   console.log(err);
-    // }
-  // })
+       }
+       document.getElementsByClassName("update-saved-devices")[0].classList.remove("disabled_button");
+    },
+    error: function(err){
+      console.log(err);
+    }
+  })
 }
 
 function update_saved_devices()
