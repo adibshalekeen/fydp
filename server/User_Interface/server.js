@@ -27,6 +27,7 @@ app.post('/sendMessage', send_message);
 app.post('/endPointMessage', end_point_message);
 app.post('/getMappings', get_mappings);
 app.post('/saveMappings', save_mappings);
+app.post('/sendMeMessage', send_me_message);
 
 /*START GET REQUESTS*/
 function get_devices(req, res) {
@@ -141,6 +142,17 @@ function save_mappings(req, res) {
         // results is an array consisting of messages collected during execution
         res.send(results);
       });
+  });
+}
+
+function send_me_message(req, res){
+  var body = "";
+  req.on('data', function (data) {
+      body += data;
+  });
+  req.on('end', function () {
+      console.log(body);
+      res.send("200 OK: Done");
   });
 }
 /*END POST REQUESTS*/
