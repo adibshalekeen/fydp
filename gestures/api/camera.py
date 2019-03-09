@@ -63,37 +63,14 @@ class Camera:
             # open cv represents frames as row major so we need to flip the resolutions
             return frame.reshape((self._true_resolution[1], self._true_resolution[0], 3))[:self._resolution[1], :self._resolution[0], :]
 
-    def start_processing(self, func, delta=False):
-        mdp = image_processing.MotionDetectionParameter
-        params = {
-            mdp.fps: 0,
-            mdp.timeout: 10,
-            mdp.max_len: 70,
-            mdp.min_len: 5,
-            mdp.path: (None, None),
-            mdp.angle: None,
-            mdp.path_encoding: None
-        }
-        selected_param = mdp.timeout
-        bgSubtractor = cv2.createBackgroundSubtractorMOG2(history=1)
-        all_centroids = np.array([[[], []]])
-        count = 10
-
-        tasks = multiprocessing.JoinableQueue()
-        camera_worker = CameraWorkerProcess(tasks)
+    def start_processing(self, process_func, update_func, persistent_args):
+        worker_task_queue = multiprocessing.JoinableQueue()
+        camera_worker = CameraWorkerProcess(worker_task_queue)
         camera_worker.start()
-
-        if delta:
-            prev_frame = None
+        
         for frame in self._camera.capture_continuous(self._rawCapture, format="bgr", use_video_port=True):
             image = frame.array
-            if delta and prev_frame is None:
-                prev_frame = image
-                self._rawCapture.truncate(0)
-                continue
-            if delta:
-                all_centroids, count, params, selected_param = func(image, bgSubtractor, all_centroids, count, params, selected_param, tasks)
-                prev_frame = image
-            else:
-                func(image)
+            ret_val = process_func(image, worker_task_queue, persistent_args)
+            if ret_val is not None:
+                update_func(ret_val, persistent_args)
             self._rawCapture.truncate(0)

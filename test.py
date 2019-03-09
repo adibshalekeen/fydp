@@ -17,8 +17,19 @@ camera_params = {
     "res":[640, 480],
     "fps":90
 }
+
 camera = api.Camera(5,
                     camera_params)
+
+mdp = image_processing.MotionDetectionParameter
+
+persistent_args = {
+    "bgSubtractor": cv2.createBackgroundSubtractorMOG2(history=1),
+    "all_centroids": np.array([[[], []]]),
+    "params": {mdp.fps: 0, mdp.timeout: 10, mdp.max_len: 70, mdp.min_len: 5, mdp.path: (None, None), mdp.angle: None, mdp.path_encoding: None},
+    "count": 10,
+    "selected_param": image_processing.MotionDetectionParameter.timeout
+}
 
 def show_camera_output(frame, **kwargs):
     object_centroid = kwargs["object_centroid"]
@@ -33,18 +44,28 @@ def show_camera_output(frame, **kwargs):
     image_processing.MotionDetection.draw_fitted_path(frame, fitted_line)
     image_processing.MotionDetection.showconfig(frame, selected_param, params)
 
-def processing(fulres, bgSubtractor, all_centroids, count, params, selected_param, tasks):
+def update_func(new_vals, args):
+    args["all_centroids"] = new_vals[0]
+    args["count"] = new_vals[1]
+    args["params"] = new_vals[2]
+    args["selected_param"] = new_vals[3]
+
+def processing_func(fulres, tasks, args):
+    bgSubtractor = args["bgSubtractor"]
+    all_centroids = args["all_centroids"]
+    count = args["count"]
+    params = args["params"]
+    selected_param = args["selected_param"]
+
     downresScale = 2
     stime = time.time()
     md = image_processing.MotionDetection
     mdp = image_processing.MotionDetectionParameter
 
     frame = md.downResImage(fulres, downresScale)
-    ###################################################################
+
     foreground, object_centroid = md.process_image_contours(
         frame, bgSubtractor, downresScale)
-
-    #frame_output = frame.copy()
 
     count, all_centroids = md.add_centroid(
         all_centroids, object_centroid, count, params[mdp.timeout])
@@ -58,10 +79,10 @@ def processing(fulres, bgSubtractor, all_centroids, count, params, selected_para
     if (fitted_line[0] is not None):
             params[mdp.path], params[mdp.angle], params[mdp.path_encoding] = md.get_fitted_path_stat(fulres, fitted_line)
             gesture = mdp.gesture_map[params[mdp.path_encoding]]
-            try:
-                requests.post(url=url, data=gesture + "|555")
-            except Exception:
-                print("Victor done goofed")
+            # try:
+            #     requests.post(url=url, data=gesture + "|555")
+            # except Exception:
+            #     print("Victor done goofed")
             print(params)
 
     tasks.put(api.CameraWorkerTask(fulres,
@@ -71,33 +92,9 @@ def processing(fulres, bgSubtractor, all_centroids, count, params, selected_para
                                    fitted_line=fitted_line,
                                    selected_param=selected_param,
                                    params=params))
-
-    # frame_output = md.add_frame_centroid(
-    #     object_centroid, frame_output, (255, 255, 255))
-    # md.add_frame_path_centroid(all_centroids, frame_output, (255, 255, 255))
-    # md.draw_fitted_path(frame_output, fitted_line)
-    # #output = md.make_visual_output(True, frame_output)
-    # md.showconfig(frame_output, selected_param, params)
-    # cv2.imshow("output", frame_output)
     
-   
-    #################################################################
-
-    # # if the `q` key is pressed, break from the loop
-    # key = cv2.waitKey(1) & 0xFF
-    # if key == ord('1'):
-    #     selected_param = mdp.timeout
-    # if key == ord('2'):
-    #     selected_param = mdp.max_len
-    # if key == ord('3'):
-    #     selected_param = mdp.min_len
-    # if key == ord('='):
-    #     params[selected_param] += 1
-    # if key == ord('-'):
-    #     params[selected_param] -= 1
-
     params[mdp.fps] = int(1 / (time.time() - stime))
     print('FPS {:.1f}'.format(1 / (time.time() - stime)))
     return all_centroids, count, params, selected_param
 
-camera.start_processing(processing, delta=True)
+camera.start_processing(processing_func, update_func, persistent_args)
