@@ -1,23 +1,50 @@
 from picamera.array import PiRGBArray
 from picamera import PiCamera, PiCameraCircularIO
 import time
-import threading
+import multiprocessing
 import io
 import cv2
 import numpy as np
 from gestures import image_processing
 
+class CameraWorkerProcess(multiprocessing.Process):
+    def __init__(self, task_queue):
+        multiprocessing.Process.__init__(self)
+        self._task_queue = task_queue
+    
+    def run(self):
+        proc_name = self.name
+        while True:
+            next_task = self._task_queue.get()
+            if next_task is None:
+                print("Goodbye Cruel World " + str(proc_name))
+                self._task_queue.task_done()
+                break
+            next_task()
+            self._task_queue.task_done()
+        return
+
+class CameraWorkerTask(object):
+    def __init__(self, frame, img_processor=None, **kwargs):
+        self._frame = frame
+        self._img_processor = img_processor
+        self._args = kwargs
+
+    def __call__(self):
+        if self._img_processor is not None:
+            self._img_processor(self._frame, **self._args)
+        cv2.imshow("Cam", self._frame)
+        cv2.waitKey(1)
+
 class Camera:
     def __init__(self,
                  exposure_time, 
                  camera_params,
-                 frame_callback,
                  outdir='captures',
                  pic_out_dir='img',
                  vid_out_dir='vid'):
         self._exposure_time = exposure_time
         self._resolution = camera_params["res"]
-        self._framecallback = frame_callback
         x_remainder = self._resolution[0] % 16
         y_remainder = self._resolution[1] % 16
         self._true_resolution = [self._resolution[0] + x_remainder, self._resolution[1] + y_remainder]
@@ -52,6 +79,10 @@ class Camera:
         all_centroids = np.array([[[], []]])
         count = 10
 
+        tasks = multiprocessing.JoinableQueue()
+        camera_worker = CameraWorkerProcess(tasks)
+        camera_worker.start()
+
         if delta:
             prev_frame = None
         for frame in self._camera.capture_continuous(self._rawCapture, format="bgr", use_video_port=True):
@@ -61,7 +92,7 @@ class Camera:
                 self._rawCapture.truncate(0)
                 continue
             if delta:
-                all_centroids, count, params, selected_param = func(image, bgSubtractor, all_centroids, count, params, selected_param)
+                all_centroids, count, params, selected_param = func(image, bgSubtractor, all_centroids, count, params, selected_param, tasks)
                 prev_frame = image
             else:
                 func(image)
