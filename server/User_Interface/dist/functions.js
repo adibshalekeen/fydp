@@ -27,6 +27,7 @@ document.getElementsByClassName('add-action')[0].addEventListener('click', add_d
 document.getElementsByClassName('delete-action')[0].addEventListener('click', delete_device_mapping, false);
 document.getElementsByClassName('save-actions')[0].addEventListener('click', save_device_mappings, false);
 
+var pageURL = $(location).attr("href");
 /********************************************************************************/
 /*                         CALLBACK FUNCTION DECLARATION                        */
 /********************************************************************************/
@@ -150,7 +151,7 @@ function display_devices()
   //var items = ["10.20.138.31", "24:18:1D:5C:67:7D", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown", "10.20.138.35", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown"];
   var items = [];
   $.ajax({
-    url:"http://127.0.0.1:2080/getDevices",
+    url: pageURL + "getDevices",
     type: "GET",
     error: function(err){
       console.log(err);
@@ -214,16 +215,16 @@ function update_saved_devices()
 
 function broadcast_ip_addr()
 {
+  console.log("test");
   // Get our IP to send
   $.ajax({
-    url:"http://127.0.0.1:2080/myIp",
+    url: pageURL + "myIp",
     type: "GET",
     success: function(myIp){
       var my_ipAddr = myIp;
-
       // Get devices to send our IP to
       $.ajax({
-        url:"http://127.0.0.1:2080/getMappings",
+        url: pageURL + "/getMappings",
         type: "POST",
         data: "mapping-table",
         success: function(items){
@@ -271,7 +272,7 @@ function load_device_mappings()
 
   var items = [];
   $.ajax({
-    url:"http://127.0.0.1:2080/getMappings",
+    url: pageURL + "getMappings",
     type: "POST",
     data: table,
     success: function(items){
@@ -356,7 +357,7 @@ function save_device_mappings()
   mapping_array += (table === "mapping-table") ? "map" : "act";
   $.ajax({
     type: "POST",
-    url: "http://127.0.0.1:2080/saveMappings",
+    url: pageURL + "saveMappings",
     data: mapping_array,
     success: function(){
     }

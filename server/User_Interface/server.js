@@ -63,7 +63,7 @@ function send_message(req, res) {
   });
   req.on('end', function () {
     var options = {
-      host: '127.0.0.1',
+      host: 'localhost',
       port: portNum,
       path: '/myIp'
     };
