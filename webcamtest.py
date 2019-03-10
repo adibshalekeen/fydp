@@ -24,7 +24,7 @@ params = {
     mdp.fps: 0,
     mdp.timeout: 10,
     mdp.max_len: 70,
-    mdp.min_len: 5,
+    mdp.min_len: 2,
     mdp.path: (None, None),
     mdp.angle: None,
     mdp.path_encoding: None
@@ -60,7 +60,7 @@ while True:
 
     if (fitted_line[0] is not None):
         params[mdp.path], params[mdp.angle], params[mdp.path_encoding] = md.get_fitted_path_stat(frame_output, fitted_line)
-
+        print(params[mdp.path_encoding])
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):
         break
