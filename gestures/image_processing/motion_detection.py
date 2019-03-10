@@ -16,16 +16,16 @@ class MotionDetectionParameter():
     angle = 5
     path_encoding = 6
 
-    gesture_map = {10:"Up", 
+    gesture_map = {12:"Up", 
                    11:"Top Right",
-                   12:"Right",
-                   13:"Bottom Right",
-                   14:"Down",
-                   20:"Up",
-                   21:"Top Left",
-                   22:"Left",
-                   23:"Bottom Left",
-                   24:"Down"}
+                   10:"Right",
+                   20:"Right",
+                   21:"Bottom Right",
+                   22:"Down",
+                   13:"Top Left",
+                   24:"Left",
+                   14:"Left",
+                   23:"Bottom Left"}
 
 class MotionDetection:
 
@@ -46,7 +46,7 @@ class MotionDetection:
         filtered_cntrs = []
         if len(contours) > 0:
             for i in range(0, len(contours)):
-                if cv2.contourArea(contours[i]) > (20000 / (2 ** (downresScale + 2))):
+                if cv2.contourArea(contours[i]) > (2500 / (2 ** (downresScale + 2))):
                     filtered_cntrs.append(contours[i])
         x = 0
         y = 0
@@ -167,15 +167,17 @@ class MotionDetection:
     def test_path(centroids, count, timeout, max_len, min_len):
         point1 = None
         point2 = None
-        if len(centroids) > max_len or count < 0:
+        if len(centroids[0][0]) > max_len or count < 0:
             x = centroids[0][0]
             y = centroids[0][1]
             if len(x) > min_len:
                 x_1 = x[0]
                 x_2 = x[len(x) - 1]
-                z = np.polyfit(x, y, 1)
-                y_1 = z[0]*x_1 + z[1]
-                y_2 = z[0]*x_2 + z[1]
+                # z = np.polyfit(x, y, 1)
+                # y_1 = z[0]*x_1 + z[1]
+                # y_2 = z[0]*x_2 + z[1]
+                y_1 = y[0]
+                y_2 = y[len(y) - 1]
                 point1 = (x_1, y_1)
                 point2 = (x_2, y_2)
             return timeout, np.array([[[], []]]), (point1, point2)
@@ -201,10 +203,9 @@ class MotionDetection:
         y_1 = int(fitted_line[0][1]*h)
         x_2 = int(fitted_line[1][0]*w)
         y_2 = int(fitted_line[1][1]*h)
-        vector = (x_2 - x_1, y_2 - y_1)
-        angle = np.arctan2([vector[0]],[vector[1]])*(180/np.pi)
+        vector = (x_2 - x_1, y_1 - y_2)
+        angle = np.arctan2(vector[1],vector[0])*(180/np.pi)
         encoding = MotionDetection.gesture(angle)
-        print(fitted_line, vector, angle,encoding)
         return vector, angle, encoding
 
     @staticmethod
