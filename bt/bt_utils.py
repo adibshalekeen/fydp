@@ -4,10 +4,10 @@ import bluetooth as bt
 Prints devices found nearby and returns a list of tuples
 """
 def discover():
-    print "Scanning for devices..."
+    print("Scanning for devices...")
     devs = bt.discover_devices(lookup_names=True)
     for addr, name in devs:
-        print " %s - %s" % (addr, name)
+        print(" %s - %s" % (addr, name))
     return devs
 
 """
@@ -16,8 +16,8 @@ Connects to specified device and returns an open socket
 """
 def connect(mac_addr, port=1):
     sckt = bt.BluetoothSocket(bt.RFCOMM)
-    print "Connecting to %s ..." % mac_addr
+    print("Connecting to %s ..." % mac_addr)
     sckt.connect((mac_addr, port))
-    print "Connected."
+    print("Connected.")
     return sckt
 

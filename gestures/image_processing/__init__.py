@@ -1,1 +1,1 @@
-from .motion_detection import MotionDetection
+from .motion_detection import MotionDetection, MotionDetectionParameter
