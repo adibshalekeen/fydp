@@ -148,7 +148,9 @@ function display_devices()
   displayElapsedTime();
   document.getElementById("device-table").innerHTML = "";
   thisClass.addClass('disabled_button');
-  //var items = ["10.20.138.31", "24:18:1D:5C:67:7D", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown", "10.20.138.35", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown"];
+  // var items = ["10.20.138.31", "24:18:1D:5C:67:7D", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown",
+  //             "10.20.138.35", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown",
+  //             "bluetooth", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown"];
   var items = [];
   $.ajax({
     url: pageURL + "getDevices",
@@ -215,7 +217,6 @@ function update_saved_devices()
 
 function broadcast_ip_addr()
 {
-  console.log("test");
   // Get our IP to send
   $.ajax({
     url: pageURL + "myIp",
@@ -224,7 +225,7 @@ function broadcast_ip_addr()
       var my_ipAddr = myIp;
       // Get devices to send our IP to
       $.ajax({
-        url: pageURL + "/getMappings",
+        url: pageURL + "getMappings",
         type: "POST",
         data: "mapping-table",
         success: function(items){
@@ -350,7 +351,6 @@ function save_device_mappings()
   {
     var row = mapping_table[i].innerText;
     row = row.replace(/ /g, "_");
-    console.log(row);
     var values = row.split(/\s+/);
     mapping_array += values + "|";
   }
