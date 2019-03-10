@@ -40,20 +40,32 @@ class MappingInterfaceCtrl:
     #     file_contents.pop(int(index))
     #     self.write_to_file(file_contents)
 
-    def get_mapped_addresses(self, source_name, action = None):
+    def get_mapped_address(self, ip_addr):
+        contents = self.get_file_contents()
+        if ip_addr:
+            for mapping in contents:
+                if mapping[1] == ip_addr:
+                    return mapping[0] + "|" + ip_addr
+
+    def get_mapped_actions(self, source_name, action = None):
         mapped_addresses = []
         contents = self.get_file_contents()
         if action:
+            name, ip = source_name.split("|")
+            # this reads the action mappings
             for mapping in contents:
-                if source_name == mapping[0]:
+                if name == mapping[0] or ip == mapping[0]:
                     if action == mapping[1]:
                         msg = mapping[2] + "|" + mapping[3]
                         mapped_addresses.append(msg)
         else:
+            dest_name = source_name
+            # this finds what output signals to send
+            # source_name is dest_name here
             for mapping in contents:
-                for source in source_name:
-                    old_src, action = source.split("|")
-                    if old_src in mapping and not old_src == '.' :
+                for dest in dest_name:
+                    old_name, action = dest.split("|")
+                    if old_name in mapping and not old_name == '.' :
                         map = mapping[1] + "|" + action
                         mapped_addresses.append(map)
         return mapped_addresses
@@ -112,10 +124,13 @@ def main():
             mapDevices = MappingInterfaceCtrl("./dist/devices.csv")
             # We defaulted to create the mapping reader, must make an action reader here
             contents = sys.argv[3]
-            s_name, s_act = contents.split("|")
-            dest_addrs = mapCont.get_mapped_addresses(s_name, s_act)
-            resp = mapDevices.get_mapped_addresses(dest_addrs)
-            for line in resp:
-                print(line)
+            s_ip, s_act = contents.split("|")
+            s_name = mapDevices.get_mapped_address(s_ip)
+            if(s_name):
+                dest_addrs = mapCont.get_mapped_actions(s_name, s_act)
+                if(dest_addrs):
+                    resp = mapDevices.get_mapped_actions(dest_addrs)
+                    for line in resp:
+                        print(line)
 
 main()

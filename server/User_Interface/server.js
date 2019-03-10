@@ -20,20 +20,34 @@ app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 
 app.use(morgan('dev')) // logging
 
+var hub_ip = "8.8.8.8";
+
 /*GET REQUESTS*/
 const ps = require('python-shell');
 app.get('/getDevices', get_devices);
+app.get('/myIp', get_my_ip);
 app.post('/sendMessage', send_message);
 app.post('/endPointMessage', end_point_message);
 app.post('/getMappings', get_mappings);
 app.post('/saveMappings', save_mappings);
 app.post('/sendMeMessage', send_me_message);
+app.post('/broadcastRx', receive_hub_ip);
 
 /*START GET REQUESTS*/
 function get_devices(req, res) {
   // When this get request is triggered, this python script will execute
   // This function gets the ddevices on the network
   ps.PythonShell.run('./dist/get_devices_script.py', null, function(err, resp){
+    if(err) throw err;
+    res.send(resp);
+  })
+}
+
+function get_my_ip(req, res){
+  let options = {
+    args: ["get_ip"]
+  };
+  ps.PythonShell.run('./dist/IpDeviceDiscovery.py', options, function(err, resp){
     if(err) throw err;
     res.send(resp);
   })
@@ -47,48 +61,65 @@ function send_message(req, res) {
       message += data;
   });
   req.on('end', function () {
-    // Received message from sender
-    let options = {
-      args: ['send_message', "act", message]
+    var options = {
+      host: 'localhost',
+      port: '2081',
+      path: '/myIp'
     };
-    // Run mapping check to see if the incoming message is valid and maps to a destination
-    // and check what devices to send to
-    ps.PythonShell.run('./dist/MappingInterfaceCtrl.py', options, function(err, resp){
-      if(err) throw err;
-      // We will send the message response for debugging purposes here
-      res.send(resp);
-      var routed_msg = resp.toString().split(',');
-
-      for(var i = 0; i < routed_msg.length; i++)
-      {
-        var dest_ip = routed_msg[i].split('|')[0];
-        var dest_act = routed_msg[i].split('|')[1];
-
-        // host is the destination of the message and port number is set to our default
-        // If we are to send to a third party manufacturer we will have pre-defined settings
-        // and will set them here
-        var post_options = {
-            host: 'localhost',//dest_ip
-            port: '2081',
-            path: '/endPointMessage',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Content-Length': dest_act.length
-            }
+    var req = http.get(options, function(getResponse) {
+      // Buffer the body entirely for processing as a whole.
+      var ip_self = "";
+      getResponse.on('data', function(chunk) {
+        ip_self += chunk;
+      }).on('end', function() {
+        var self_ip = ip_self.substr(2, ip_self.length - 4);
+        // Received message from sender
+        let options = {
+          args: ['send_message', "act", self_ip + "|" + message]
         };
-        // Set up the request
-        var post_req = http.request(post_options, function(res) {
-            res.setEncoding('utf8');
-            res.on('data', function (chunk) {
-                console.log('Response: ' + chunk);
-            });
-        });
-        // post the data
-        post_req.write(dest_act);
-        post_req.end();
-      }
-    })
+        // Run mapping check to see if the incoming message is valid and maps to a destination
+        // and check what devices to send to
+        ps.PythonShell.run('./dist/MappingInterfaceCtrl.py', options, function(err, resp){
+          if(err) throw err;
+          // send response to free the client
+          res.send("Routed to: " + resp);
+          if(resp)
+          {
+            var routed_msg = resp.toString().split(',');
+
+            for(var i = 0; i < routed_msg.length; i++)
+            {
+              var dest_ip = routed_msg[i].split('|')[0];
+              var dest_act = routed_msg[i].split('|')[1];
+
+              // host is the destination of the message and port number is set to our default
+              // If we are to send to a third party manufacturer we will have pre-defined settings
+              // and will set them here
+              var post_options = {
+                  host: dest_ip,//dest_ip
+                  port: '2081',
+                  path: '/endPointMessage',
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/x-www-form-urlencoded',
+                      'Content-Length': dest_act.length
+                  }
+              };
+              // Set up the request
+              var post_req = http.request(post_options, function(res) {
+                  res.setEncoding('utf8');
+                  res.on('data', function (chunk) {
+                      console.log('Response: ' + chunk);
+                  });
+              });
+              // post the data
+              post_req.write(dest_act);
+              post_req.end();
+            }
+          }
+        })
+      });
+    });
   });
 }
 
@@ -99,13 +130,6 @@ function end_point_message(req, res) {
   });
   req.on('end', function () {
     console.log(message);
-    // let options = {
-    //   args: ['send_message', "act", message]
-    // };
-    // ps.PythonShell.run('./dist/MappingInterfaceCtrl.py', options, function(err, resp){
-    //   if(err) throw err;
-    //   res.send(resp);
-    // })
     res.send("OK");
   });
 }
@@ -145,6 +169,7 @@ function save_mappings(req, res) {
   });
 }
 
+// testing message
 function send_me_message(req, res){
   var body = "";
   req.on('data', function (data) {
@@ -153,6 +178,18 @@ function send_me_message(req, res){
   req.on('end', function () {
       console.log(body);
       res.send("200 OK: Done");
+  });
+}
+
+// API to call to receive the IP of hub
+function receive_hub_ip(req, res){
+  var body = "";
+  req.on('data', function (data) {
+      body += data;
+  });
+  req.on('end', function () {
+      hub_ip = body;
+      res.send("200 OK: Done got " + body);
   });
 }
 /*END POST REQUESTS*/

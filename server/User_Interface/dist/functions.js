@@ -15,6 +15,7 @@ document.getElementsByClassName('find-devices')[0].addEventListener('click', dis
 document.getElementsByClassName('update-saved-devices')[0].addEventListener('click', update_saved_devices, false);
 
 // Event handler for device mappings list
+document.getElementsByClassName('broadcast-ip')[0].addEventListener('click', broadcast_ip_addr, false);
 document.getElementsByClassName('load-mappings')[0].addEventListener('click', load_device_mappings, false);
 document.getElementsByClassName('add-mapping')[0].addEventListener('click', add_device_mapping, false);
 document.getElementsByClassName('delete-mapping')[0].addEventListener('click', delete_device_mapping, false);
@@ -151,6 +152,12 @@ function display_devices()
   $.ajax({
     url:"http://localhost:2081/getDevices",
     type: "GET",
+    error: function(err){
+      console.log(err);
+      clearInterval(searchTimeElapsed);
+      thisClass.removeClass('disabled_button');
+      document.getElementById("device-table").innerHTML = "Request failed";
+    },
     success: function(items){
        thisClass.removeClass('disabled_button');
        make_table(items, "device-table", false);
@@ -161,11 +168,8 @@ function display_devices()
           clickable_items[i].addEventListener('dblclick', autoAdd, false);
        }
        document.getElementsByClassName("update-saved-devices")[0].classList.remove("disabled_button");
-    },
-    error: function(err){
-      console.log(err);
     }
-  })
+  });
 }
 
 function update_saved_devices()
@@ -200,12 +204,55 @@ function update_saved_devices()
 
   make_table(mapping_array.flat(), "mapping-table", true);
   document.getElementsByClassName("save-mappings")[0].classList.remove("disabled_button");
-  document.getElementsByClassName("update-saved-devices")[0].classList.add("disabled_button");
+  //document.getElementsByClassName("update-saved-devices")[0].classList.add("disabled_button");
   var clickable_items = document.getElementsByClassName('clickable');
   for (var i = 0; i < clickable_items.length; i++) {
       clickable_items[i].addEventListener('click', clickResp, false);
       clickable_items[i].addEventListener('dblclick', dblClickResp, false);
   }
+}
+
+function broadcast_ip_addr()
+{
+  // Get our IP to send
+  $.ajax({
+    url:"http://localhost:2081/myIp",
+    type: "GET",
+    success: function(myIp){
+      var my_ipAddr = myIp;
+
+      // Get devices to send our IP to
+      $.ajax({
+        url:"http://localhost:2081/getMappings",
+        type: "POST",
+        data: "mapping-table",
+        success: function(items){
+          for(var i = 1; i < items.length; i += 3){
+
+            // Push our IP to all the saved clients
+            $.ajax({
+              url:"http://" + items[i] + ":2081/broadcastRx",
+              type: "POST",
+              data: my_ipAddr[0],
+              timeout: 250,
+              success: function(response){
+                console.log(response);
+              },
+              error: function(err){
+                console.log(err);
+              }
+            });
+          }
+        },
+        error: function(err){
+          console.log(err);
+        }
+      });
+    },
+    error: function(err){
+      console.log(err);
+    }
+  });
 }
 
 function load_device_mappings()
