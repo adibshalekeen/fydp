@@ -21,6 +21,7 @@ app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 app.use(morgan('dev')) // logging
 
 var hub_ip = "8.8.8.8";
+var portNum = "2080";
 
 /*GET REQUESTS*/
 const ps = require('python-shell');
@@ -63,7 +64,7 @@ function send_message(req, res) {
   req.on('end', function () {
     var options = {
       host: 'localhost',
-      port: '2081',
+      port: portNum,
       path: '/myIp'
     };
     var req = http.get(options, function(getResponse) {
@@ -97,7 +98,7 @@ function send_message(req, res) {
               // and will set them here
               var post_options = {
                   host: dest_ip,//dest_ip
-                  port: '2081',
+                  port: portNum,
                   path: '/endPointMessage',
                   method: 'POST',
                   headers: {
@@ -199,5 +200,4 @@ function receive_hub_ip(req, res){
 app.get('/', (req, res, next) => res.sendFile(path.join(__dirname, 'index.html')));
 
 //Run Server
-const port = 2081;
-app.listen(process.env.PORT || port, "0.0.0.0", () => console.log(chalk.blue(`Listening intently on port ${port}`)));
+app.listen(portNum, "0.0.0.0", () => console.log(chalk.blue(`Listening intently on port ${portNum}`)));
