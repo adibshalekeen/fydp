@@ -149,15 +149,10 @@ function get_device_types(this_class, deviceType)
 {
   displayElapsedTime(deviceType);
   document.getElementById("device-table").innerHTML = "";
-<<<<<<< HEAD
-  this_class.addClass('disabled_button');
-  //var items = ["10.20.138.31", "24:18:1D:5C:67:7D", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown", "10.20.138.35", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown"];
-=======
   thisClass.addClass('disabled_button');
   // var items = ["10.20.138.31", "24:18:1D:5C:67:7D", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown",
   //             "10.20.138.35", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown",
   //             "bluetooth", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown"];
->>>>>>> fa6011269c983195d8a69830930975d71194778e
   var items = [];
   $.ajax({
     url: pageURL + "getDevices",
