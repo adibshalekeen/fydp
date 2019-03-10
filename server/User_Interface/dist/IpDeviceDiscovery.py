@@ -33,7 +33,7 @@ def find_network_devices(debug=False):
     devices = response.stdout.decode('utf-8')
 
     # Regular expression to capture IP address, MAC address, Device name and Manufacturer
-    ip_addresses = re.findall('Nmap.*for\s([a-zA-Z0-9\(\)\s\.\-\'\_]*\s)?.*(\d{3}\.\d{1,3}\.\d{1,3}\.\d{1,3}).*\n.*\n.*?:\s(.*?)\s\(([a-zA-Z0-9\(\)\s\.\-\']*?)\)', devices)
+    ip_addresses = re.findall('Nmap.*for\s([a-zA-Z0-9\(\)\s\.\-\'\_]*\s)?.*?(\d*\.\d{1,3}\.\d{1,3}\.\d{1,3}).*\n.*\n.*?:\s(.*?)\s\(([a-zA-Z0-9\(\)\s\.\-\']*?)\)', devices)
 
     if debug:
         for ip in ip_addresses:

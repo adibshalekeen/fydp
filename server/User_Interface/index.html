@@ -9,10 +9,12 @@
   </head>
   <body>
     <div class="top-bar">
-      <div class="top-bar-text not-selectable-text">C* Configuration</div>
-    </div>
+      <img class="top-bar-logo" src="assets/whiteCStarLogo.png">
+	    <div class="top-bar-text not-selectable-text">ontrol
+	      <img class="top-bar-logo-hub" src="assets/hub.png">
+      </div>
+	</div>
     <div class="content-area">
-
       <div class="content-table-wrapper">
         <div class="header-text not-selectable-text">Device(s) on the Network</div>
         <div class="table100 ver1">
@@ -36,8 +38,12 @@
           </div>
         </div>
         <div class="main-button">
-          <button class="find-devices not-selectable-text">Find Devices</button>
+          <button class="find-ip-devices option not-selectable-text">Find IP Devices</button>
+          <button class="find-bluetooth-devices option not-selectable-text">Find Bluetooth Devices</button>
+          <button class="find-zigbee-devices disabled_button option not-selectable-text">Find Zigbee Devices</button>
           <button class="update-saved-devices disabled_button not-selectable-text">Update Saved Devices</button>
+          <button class="find-devices not-selectable-text">Find All Devices</button>
+
         </div>
       </div>
 
@@ -63,11 +69,11 @@
           </div>
         </div>
         <div class="main-button">
-          <button class="not-selectable-text broadcast-ip">Broadcast Ip</button>
-          <button class="not-selectable-text add-mapping">Add Device</button>
-          <button class="not-selectable-text delete-mapping">Remove Device</button>
-          <button class="not-selectable-text load-mappings">Load Saved Devices</button>
+          <button class="not-selectable-text option broadcast-ip">Connect to Saved Devices</button>
           <button class="not-selectable-text save-mappings disabled_button">Save Devices</button>
+          <button class="not-selectable-text load-mappings">Load Saved Devices</button>
+          <button class="not-selectable-text delete-mapping">Remove Device</button>
+          <button class="not-selectable-text add-mapping">Add Device</button>
         </div>
       </div>
 
@@ -94,10 +100,10 @@
           </div>
         </div>
         <div class="main-button">
-          <button class="not-selectable-text add-action">Add Action</button>
-          <button class="not-selectable-text delete-action">Delete Action</button>
-          <button class="not-selectable-text load-actions">Load Actions</button>
           <button class="not-selectable-text save-actions disabled_button">Save Actions</button>
+          <button class="not-selectable-text load-actions">Load Actions</button>
+          <button class="not-selectable-text delete-action">Delete Action</button>
+          <button class="not-selectable-text add-action">Add Action</button>
         </div>
       </div>
       <div class="footer"></div>

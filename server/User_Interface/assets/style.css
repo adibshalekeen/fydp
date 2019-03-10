@@ -208,8 +208,16 @@ p {
 
 .top-bar {
 		font-family: sans-serif;
-	  height: 100px;
+		height: 120px;
 		box-shadow: inset 0px -3px 5px #383d4157;
+}
+
+.top-bar-logo {
+		height: 7rem;
+		float: left;
+		margin-left: 2rem;
+		margin-top: 0.5rem;
+		margin-bottom: 0.5rem;
 }
 
 .not-selectable-text {
@@ -217,31 +225,47 @@ p {
 }
 
 .top-bar-text {
+		padding-top: 0.8rem;
+		height: 8rem;
 		border-bottom: 3px green solid;
 		font-weight: 500;
-		font-size: 60;
+		font-size: 70;
 		letter-spacing: 3px;
-		padding-left: 1rem;
 		display: inherit;
 		color: #ffffff;
 }
 
+.top-bar-logo-hub {
+		position: absolute;
+		width: 10rem;
+		margin-top: 0.5rem;
+		margin-left: 0.5rem;
+}
 .main-button {
+		width: 100%;
 		padding-top: 1rem;
-	  position: relative;
+		position: relative;
 		float: right;
 }
 
 .main-button button {
+		float: right;
 		background-color: #d1e8e2;
 		border-radius: 5px !important;
 		padding: 10px 15px;
+		margin-left: 5px;
 		color: #000000;
 		font-size: 14px;
 		font-weight: 500;
 		text-decoration: none;
-    border: 0px solid #eee;
+		border: 0px solid #eee;
 		cursor: pointer;
+}
+
+.main-button button.option {
+		float: left;
+		margin-left: 0;
+		margin-right: 5px;
 }
 
 .main-button button:hover {

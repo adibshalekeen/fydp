@@ -25,8 +25,8 @@ var portNum = "2080";
 
 /*GET REQUESTS*/
 const ps = require('python-shell');
-app.get('/getDevices', get_devices);
 app.get('/myIp', get_my_ip);
+app.post('/getDevices', get_devices);
 app.post('/sendMessage', send_message);
 app.post('/endPointMessage', end_point_message);
 app.post('/getMappings', get_mappings);
@@ -35,15 +35,6 @@ app.post('/sendMeMessage', send_me_message);
 app.post('/broadcastRx', receive_hub_ip);
 
 /*START GET REQUESTS*/
-function get_devices(req, res) {
-  // When this get request is triggered, this python script will execute
-  // This function gets the ddevices on the network
-  ps.PythonShell.run('./dist/get_devices_script.py', null, function(err, resp){
-    if(err) throw err;
-    res.send(resp);
-  })
-}
-
 function get_my_ip(req, res){
   let options = {
     args: ["get_ip"]
@@ -56,6 +47,24 @@ function get_my_ip(req, res){
 /*END GET REQUESTS*/
 
 /*START POST REQUESTS*/
+function get_devices(req, res) {
+  var message = "";
+  req.on('data', function (data) {
+      message += data;
+  });
+  req.on('end', function () {
+    let options = {
+      args: [message]
+    };
+    // When this get request is triggered, this python script will execute
+    // This function gets the ddevices on the network
+    ps.PythonShell.run('./dist/get_devices_script.py', options, function(err, resp){
+      if(err) throw err;
+      res.send(resp);
+    });
+  });
+}
+
 function send_message(req, res) {
   var message = "";
   req.on('data', function (data) {

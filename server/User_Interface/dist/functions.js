@@ -11,6 +11,9 @@ for (var i = 0; i < fixed.length; i++) {
 }
 
 // Event handler for populating device list
+document.getElementsByClassName('find-ip-devices')[0].addEventListener('click', display_ip_devices, false);
+document.getElementsByClassName('find-bluetooth-devices')[0].addEventListener('click', display_bluetooth_devices, false);
+document.getElementsByClassName('find-zigbee-devices')[0].addEventListener('click', display_zigbee_devices, false);
 document.getElementsByClassName('find-devices')[0].addEventListener('click', display_devices, false);
 document.getElementsByClassName('update-saved-devices')[0].addEventListener('click', update_saved_devices, false);
 
@@ -130,37 +133,37 @@ function add_row(element_id, clickable, fields = null)
   document.getElementById(element_id).innerHTML += html;
 }
 
-function displayElapsedTime()
+function displayElapsedTime(nameOfTable)
 {
   var timeElapsed = 1;
   var message = "";
 
   searchTimeElapsed = setInterval(function displayTime() {
-    message = "Elapsed Time: " + timeElapsed + "s";
+    message = "Elapsed time searching for " + nameOfTable + " devices: "+ timeElapsed + "s";
     document.getElementById("device-table").innerHTML = message;
     timeElapsed += 1;
   }, 1000);
 }
 
-function display_devices()
+function get_device_types(this_class, deviceType)
 {
-  var thisClass = $(this);
-  displayElapsedTime();
+  displayElapsedTime(deviceType);
   document.getElementById("device-table").innerHTML = "";
-  thisClass.addClass('disabled_button');
+  this_class.addClass('disabled_button');
   //var items = ["10.20.138.31", "24:18:1D:5C:67:7D", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown", "10.20.138.35", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown"];
   var items = [];
   $.ajax({
     url: pageURL + "getDevices",
-    type: "GET",
+    type: "POST",
+    data: deviceType,
     error: function(err){
       console.log(err);
       clearInterval(searchTimeElapsed);
-      thisClass.removeClass('disabled_button');
+      this_class.removeClass('disabled_button');
       document.getElementById("device-table").innerHTML = "Request failed";
     },
     success: function(items){
-       thisClass.removeClass('disabled_button');
+       this_class.removeClass('disabled_button');
        make_table(items, "device-table", false);
        clearInterval(searchTimeElapsed);
 
@@ -171,6 +174,31 @@ function display_devices()
        document.getElementsByClassName("update-saved-devices")[0].classList.remove("disabled_button");
     }
   });
+}
+
+// LISTENERS *****************************************************************
+function display_ip_devices()
+{
+  var thisClass = $(this);
+  get_device_types(thisClass, "ip");
+}
+
+function display_bluetooth_devices()
+{
+  var thisClass = $(this);
+  get_device_types(thisClass, "bluetooth");
+}
+
+function display_zigbee_devices()
+{
+  var thisClass = $(this);
+  get_device_types(thisClass, "zigbee");
+}
+
+function display_devices()
+{
+  var thisClass = $(this);
+  get_device_types(thisClass, "all");
 }
 
 function update_saved_devices()
@@ -215,7 +243,6 @@ function update_saved_devices()
 
 function broadcast_ip_addr()
 {
-  console.log("test");
   // Get our IP to send
   $.ajax({
     url: pageURL + "myIp",
@@ -224,7 +251,7 @@ function broadcast_ip_addr()
       var my_ipAddr = myIp;
       // Get devices to send our IP to
       $.ajax({
-        url: pageURL + "/getMappings",
+        url: pageURL + "getMappings",
         type: "POST",
         data: "mapping-table",
         success: function(items){
@@ -350,7 +377,6 @@ function save_device_mappings()
   {
     var row = mapping_table[i].innerText;
     row = row.replace(/ /g, "_");
-    console.log(row);
     var values = row.split(/\s+/);
     mapping_array += values + "|";
   }
