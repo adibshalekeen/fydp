@@ -150,7 +150,7 @@ function display_devices()
   //var items = ["10.20.138.31", "24:18:1D:5C:67:7D", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown", "10.20.138.35", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown"];
   var items = [];
   $.ajax({
-    url:"http://localhost:2081/getDevices",
+    url:"http://127.0.0.1:2080/getDevices",
     type: "GET",
     error: function(err){
       console.log(err);
@@ -216,14 +216,14 @@ function broadcast_ip_addr()
 {
   // Get our IP to send
   $.ajax({
-    url:"http://localhost:2081/myIp",
+    url:"http://127.0.0.1:2080/myIp",
     type: "GET",
     success: function(myIp){
       var my_ipAddr = myIp;
 
       // Get devices to send our IP to
       $.ajax({
-        url:"http://localhost:2081/getMappings",
+        url:"http://127.0.0.1:2080/getMappings",
         type: "POST",
         data: "mapping-table",
         success: function(items){
@@ -231,7 +231,7 @@ function broadcast_ip_addr()
 
             // Push our IP to all the saved clients
             $.ajax({
-              url:"http://" + items[i] + ":2081/broadcastRx",
+              url:"http://" + items[i] + ":2080/broadcastRx",
               type: "POST",
               data: my_ipAddr[0],
               timeout: 250,
@@ -271,7 +271,7 @@ function load_device_mappings()
 
   var items = [];
   $.ajax({
-    url:"http://localhost:2081/getMappings",
+    url:"http://127.0.0.1:2080/getMappings",
     type: "POST",
     data: table,
     success: function(items){
@@ -356,7 +356,7 @@ function save_device_mappings()
   mapping_array += (table === "mapping-table") ? "map" : "act";
   $.ajax({
     type: "POST",
-    url: "http://localhost:2081/saveMappings",
+    url: "http://127.0.0.1:2080/saveMappings",
     data: mapping_array,
     success: function(){
     }
