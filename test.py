@@ -8,7 +8,7 @@ import requests
 import multiprocessing
 
 first = True
-ip = "http://192.168.0.54:"
+ip = "http://localhost:"
 port = "2081/sendMeMessage"
 url = ip + port
 http_params = {'gesture': None}
@@ -80,12 +80,12 @@ def processing_func(fulres, tasks, args):
         params[MotionDetectionParameter.min_len])
 
     if (fitted_line[0] is not None):
-            params[MotionDetectionParameter.path], params[MotionDetectionParameter.angle], params[MotionDetectionParameter.path_encoding] = md.get_fitted_path_stat(fulres, fitted_line)
+            params[MotionDetectionParameter.path], params[MotionDetectionParameter.angle], params[MotionDetectionParameter.path_encoding] = MotionDetection.get_fitted_path_stat(fulres, fitted_line)
             gesture = MotionDetectionParameter.gesture_map[params[MotionDetectionParameter.path_encoding]]
-            # try:
-            #     requests.post(url=url, data=gesture + "|555")
-            # except Exception:
-            #     print("Victor done goofed")
+            try:
+                requests.post(url=url, data=gesture + "|555")
+            except Exception:
+                print("Victor done goofed")
             print(params)
 
     tasks.put(api.CameraWorkerTask(fulres,
