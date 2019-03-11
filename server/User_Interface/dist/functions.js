@@ -149,7 +149,7 @@ function get_device_types(this_class, deviceType)
 {
   displayElapsedTime(deviceType);
   document.getElementById("device-table").innerHTML = "";
-  thisClass.addClass('disabled_button');
+  this_class.addClass('disabled_button');
   // var items = ["10.20.138.31", "24:18:1D:5C:67:7D", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown",
   //             "10.20.138.35", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown",
   //             "bluetooth", "24:18:1D:5C:67:7E", "v1020-wn-138-31.campus-dynamic.uwaterloo.ca", "Unknown"];
@@ -225,7 +225,7 @@ function update_saved_devices()
 
     for(var j = 0; j < devices_array.length; j++)
     {
-      if(devices_array[j][1] == values[2])
+      if(devices_array[j][1] === values[2])
       {
         values[1] = devices_array[j][0];
       }
@@ -258,12 +258,24 @@ function broadcast_ip_addr()
         data: "mapping-table",
         success: function(items){
           for(var i = 1; i < items.length; i += 3){
-
+            var url = "";
+            var data = "";
+            if(items[i] === "BLUETOOTH"){
+              url = pageURL + "connectBT";
+              data = items[i+1];
+            }
+            else if(items[i] === "ZIGBEE"){
+              continue;
+            }
+            else{
+              url = "http://" + items[i] + ":2080/broadcastRx";
+              data = my_ipAddr[0];
+            }
             // Push our IP to all the saved clients
             $.ajax({
-              url:"http://" + items[i] + ":2080/broadcastRx",
+              url: url,
               type: "POST",
-              data: my_ipAddr[0],
+              data: data,
               timeout: 250,
               success: function(response){
                 console.log(response);
@@ -347,7 +359,7 @@ function delete_device_mapping()
   var clicked_btn = document.getElementsByClassName("clicked");
   var delete_req_parent = clicked_btn[0].parentNode.id;
 
-  var disable_btn = (delete_req == "map") ? "save-mappings" : "save-actions";
+  var disable_btn = (delete_req === "map") ? "save-mappings" : "save-actions";
   document.getElementsByClassName(disable_btn)[0].classList.remove("disabled_button");
 
   if(clicked_btn.length && (delete_req_parent.indexOf(delete_req) >= 0))

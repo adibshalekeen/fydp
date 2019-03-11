@@ -30,7 +30,10 @@ def main():
 
         elif devicesToGet == "all":
             allDevs = getIpDevices()
-            #allDevs.append(getBluetoothDevices())
+            btDevs = getBluetoothDevices()
+
+            for bt in btDevs:
+                allDevs.append(bt)
             #allDevs.append(getZigbeeDevices())
 
         # print all the devices for the node server to receive

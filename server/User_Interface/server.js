@@ -33,6 +33,7 @@ app.post('/getMappings', get_mappings);
 app.post('/saveMappings', save_mappings);
 app.post('/sendMeMessage', send_me_message);
 app.post('/broadcastRx', receive_hub_ip);
+app.post('/connectBT', connect_bt);
 
 /*START GET REQUESTS*/
 function get_my_ip(req, res){
@@ -105,6 +106,7 @@ function send_message(req, res) {
               // host is the destination of the message and port number is set to our default
               // If we are to send to a third party manufacturer we will have pre-defined settings
               // and will set them here
+              dest_ip = (hub_ip != "8.8.8.8") ? hub_ip : dest_ip;
               var post_options = {
                   host: dest_ip,//dest_ip
                   port: portNum,
@@ -200,6 +202,23 @@ function receive_hub_ip(req, res){
   req.on('end', function () {
       hub_ip = body;
       res.send("200 OK: Done got " + body);
+  });
+}
+
+function connect_bt(req, res){
+  var bt_mac = "";
+  req.on('data', function (data) {
+      bt_mac += data;
+  });
+  req.on('end', function () {
+      let options = {
+        args: ['connect', bt_mac]
+      };
+      ps.PythonShell.run('./dist/handle_bluetooth_actions.py', options, function (err, results) {
+        if (err) throw err;
+        // results is an array consisting of messages collected during execution
+        res.send(results);
+      });
   });
 }
 /*END POST REQUESTS*/
