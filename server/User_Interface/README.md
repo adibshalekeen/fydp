@@ -14,7 +14,7 @@ The backend script handling is processed on Python3 and will require the relevan
 # Functionalities of Interface
 The interface will be able to do the following:
 * Discover devices connected to your network on the IP, Bluetooth and Zigbee bands
-* Save the discovered devices with reference to their name, IP and MAC address 
+* Save the discovered devices with reference to their name, IP and MAC address
 * Connect to a bluetooth device defined in the saved devices
 * Create a mapping between incoming IP signals to outgoing IP, Bluetooth or Zigbee bands
 
@@ -31,4 +31,4 @@ sudo apt-get install bluealsa pulseaudio pulseaudio-module-bluetooth
 pip3 install pexpect bluetooth
 ```
 * pexpect - Used for CLI command sending and receiving
-* bluetooth - Used for BT device discovery, could also use bluetoothctl built in but this is easier to process
+* bluetooth - Used for BT device discovery but could also use bluetoothctl built in but this is easier to process
