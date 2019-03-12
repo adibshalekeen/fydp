@@ -38,6 +38,10 @@ class MotionDetection:
     def get_full_contours(current_frame, subtractor, downresScale):
         foreground = MotionDetection.remove_background(
             current_frame, subtractor)
+        kernel = np.ones((5,5),np.uint8)
+        foreground = cv2.erode(foreground,kernel,iterations=1)
+        foreground = cv2.dilate(foreground,kernel,iterations=2)
+
         output = MotionDetection.channel_image(foreground, 0)
 
         contours = cv2.findContours(
