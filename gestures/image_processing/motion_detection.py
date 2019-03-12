@@ -15,7 +15,7 @@ class MotionDetectionParameter():
     path = 4
     angle = 5
     path_encoding = 6
-
+    gesture_cooldown = 10
     gesture_map = {12:"Up", 
                    11:"Top Right",
                    10:"Right",
@@ -28,7 +28,6 @@ class MotionDetectionParameter():
                    23:"Bottom Left"}
 
 class MotionDetection:
-
     @staticmethod
     def remove_background(frame, subtractor):
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
@@ -42,11 +41,11 @@ class MotionDetection:
         output = MotionDetection.channel_image(foreground, 0)
 
         contours = cv2.findContours(
-            foreground.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[1]
+            foreground.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[1]
         filtered_cntrs = []
         if len(contours) > 0:
             for i in range(0, len(contours)):
-                if cv2.contourArea(contours[i]) > (2500 / (2 ** (downresScale + 2))):
+                if cv2.contourArea(contours[i]) > (500 / (2 ** (downresScale + 2))):
                     filtered_cntrs.append(contours[i])
         x = 0
         y = 0
@@ -56,26 +55,30 @@ class MotionDetection:
             c = MotionDetection.centroid_from_contours(filtered_cntrs)
             x = c[0]/width
             y = c[1]/height
-
-        # hull = cv2.convexHull(flat_list, False)
-        # cv2.drawContours(output, filtered_cntrs, -1, (0, 255, 0), 1)
-        # cv2.drawContours(output, hull, -1, (0, 255, 0), 1)
         cv2.drawContours(output, filtered_cntrs, -1, (0, 255, 0), 1)
-        # cv2.drawContours(output, hull, -1, (0, 255, 0), 1)
-
         return output, (x, y)
 
     @staticmethod
     def centroid_from_contours(contours):
-        x_sum = 0
-        y_sum = 0
-        count = 0
+        # x_sum = 0
+        # y_sum = 0
+        # count = 0
+        # for c in contours:
+        #     count += c.shape[0]
+        #     vextex_sum = np.sum(c, axis=0)
+        #     x_sum += vextex_sum[0, 0]
+        #     y_sum += vextex_sum[0, 1]
+        # return int(x_sum / count), int(y_sum / count)
+        min_y = 1000
+        x = 0
         for c in contours:
-            count += c.shape[0]
-            vextex_sum = np.sum(c, axis=0)
-            x_sum += vextex_sum[0, 0]
-            y_sum += vextex_sum[0, 1]
-        return int(x_sum / count), int(y_sum / count)
+            min_ys = np.where(c[:,0,1] == np.min(c[:,0,1]))[0]
+            min_index = min_ys[len(min_ys) - 1]
+            y = c[min_index,0,1]
+            if y < min_y:
+                min_y = y
+                x = c[min_index,0,0]
+        return x, min_y
 
     @staticmethod
     def channel_image(frame, channel):
@@ -170,17 +173,18 @@ class MotionDetection:
         if len(centroids[0][0]) > max_len or count < 0:
             x = centroids[0][0]
             y = centroids[0][1]
-            if len(x) > min_len:
-                x_1 = x[0]
-                x_2 = x[len(x) - 1]
-                # z = np.polyfit(x, y, 1)
-                # y_1 = z[0]*x_1 + z[1]
-                # y_2 = z[0]*x_2 + z[1]
-                y_1 = y[0]
-                y_2 = y[len(y) - 1]
-                point1 = (x_1, y_1)
-                point2 = (x_2, y_2)
-            return timeout, np.array([[[], []]]), (point1, point2)
+            if len(x) > 2:
+                delta_x = np.max(x) - np.min(x)
+                delta_y = np.max(y) - np.min(y)
+                distance_travelled = np.sqrt(delta_x**2 + delta_y**2)
+                if distance_travelled > min_len:
+                    x_1 = x[0]
+                    x_2 = x[len(x) - 1]
+                    y_1 = y[0]
+                    y_2 = y[len(y) - 1]
+                    point1 = (x_1, y_1)
+                    point2 = (x_2, y_2)
+                return timeout, np.array([[[], []]]), (point1, point2)
         return count, centroids, (point2, point1)
 
     @staticmethod

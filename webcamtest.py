@@ -57,7 +57,6 @@ while True:
     output = md.make_visual_output(True, frame_output, foreground)
     md.showconfig(output, selected_parameter, params)
     cv2.imshow("output", output.astype(np.uint8))
-
     if (fitted_line[0] is not None):
         params[mdp.path], params[mdp.angle], params[mdp.path_encoding] = md.get_fitted_path_stat(frame_output, fitted_line)
         print(params[mdp.path_encoding])
