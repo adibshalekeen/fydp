@@ -7,7 +7,6 @@ import imutils
 import requests
 import multiprocessing
 
-first = True
 ip = "http://localhost:"
 port = "2081/sendMeMessage"
 url = ip + port
@@ -21,16 +20,14 @@ camera_params = {
 camera = api.Camera(5,
                     camera_params)
 
-mdp = MotionDetectionParameter
-
 persistent_args = {
     "bgSubtractor": cv2.createBackgroundSubtractorMOG2(history=8),
     "all_centroids": np.array([[[], []]]),
     "cooldown": False,
     "params": {MotionDetectionParameter.fps: 0,
-               MotionDetectionParameter.timeout: 2,
-               MotionDetectionParameter.gesture_cooldown: 10,
-               MotionDetectionParameter.max_len: 5,
+               MotionDetectionParameter.timeout: 5,
+               MotionDetectionParameter.gesture_cooldown: 8,
+               MotionDetectionParameter.max_len: 10,
                MotionDetectionParameter.min_len: 0.5,
                MotionDetectionParameter.path: (None, None),
                MotionDetectionParameter.angle: None,
@@ -116,3 +113,12 @@ def processing_func(fulres, tasks, args):
     return all_centroids, count, params, selected_param
 
 camera.start_processing(processing_func, update_func, persistent_args)
+
+# mic = api.Microphone()
+# print("Recording")
+# start = time.time()
+# audio = mic.listen(2)
+# print("Done")
+# mic.recognize()
+# print("It took: " + str(time.time() - start))
+# mic.close()
