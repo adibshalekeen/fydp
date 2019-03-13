@@ -23,7 +23,7 @@ def getApiKey(ip):
     if response is not None:
         data = response.json()
         if 'success' in data[0]:
-            return data[0]['success']['username']
+            print(data[0]['success']['username'])
     return None
 
 def getAllLights(ip, key):
@@ -33,7 +33,7 @@ def getAllLights(ip, key):
         data = response.json()
         lights = []
         for light in data:
-            lights.append({"id": light, "name":data[str(light)]["name"], "mfid":data[str(light)]["manufacturername"]})
+            lights.append([data[str(light)]["name"], "ZIGBEE", light, data[str(light)]["manufacturername"]])
         return lights
     return None
 
@@ -60,7 +60,7 @@ def dimLight(ip, key, id, brightness, transition_time):
         data = response.json()
         print(data)
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     ip = "192.168.0.52"
     key = getApiKey(ip)
     lights = getAllLights(ip, key)

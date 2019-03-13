@@ -21,9 +21,11 @@ app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 app.use(morgan('dev')) // logging
 
 var hub_ip = "8.8.8.8";
+var zig_hub_ip = "1.1.1.1";
 var portNum = "2080";
 var currSongIndex = 0;
 var currentVolume = 70;
+var zigbeeToken = "not_found";
 
 /*GET REQUESTS*/
 const ps = require('python-shell');
@@ -38,6 +40,9 @@ app.post('/sendMeMessage', send_me_message);
 app.post('/broadcastRx', receive_hub_ip);
 app.post('/connectBT', connect_bt);
 app.post('/btSongAction', bt_song_action);
+app.post('/connectZigbee', connect_zigbee);
+app.post('/zigbeeAction', zigbee_action);
+
 
 /*START GET REQUESTS*/
 function get_my_ip(req, res){
@@ -58,9 +63,21 @@ function get_devices(req, res) {
       message += data;
   });
   req.on('end', function () {
+    if(message === "zigbee")
+    {
+      if(zig_hub_ip === "1.1.1.1" || zigbeeToken === "not_found")
+      {
+        message = "Initialize zigbee first";
+        console.log(message);
+        res.send(message);
+        return;
+      }
+    }
+
     let options = {
-      args: [message]
+      args: [message, zig_hub_ip, zigbeeToken]
     };
+    console.log(message + " " + zig_hub_ip + " " + zigbeeToken);
     // When this get request is triggered, this python script will execute
     // This function gets the ddevices on the network
     ps.PythonShell.run('./dist/get_devices_script.py', options, function(err, resp){
@@ -151,10 +168,9 @@ function hub_point_message(req, res){
             // handle the http calls
           }
           else{
-            // dest_name = routed_msg[i].split('|')[0];
-            // dest_addr = routed_msg[i].split('|')[1];
-            dest_act = routed_msg[0].replace("BLUETOOTH|", "");//[i].split('|')[2];
-            console.log(dest_act);
+            dest_act = routed_msg[i].replace("BLUETOOTH|", "");
+            dest_act = routed_msg[i].replace("ZIGBEE|", "");
+            console.log(dest_act + "hubPtMessage");
 
             var path = (second_field === "BLUETOOTH") ? "/btSongAction" : "/zigbeeAction";
             // host is the destination of the message and port number is set to our default
@@ -330,6 +346,50 @@ function bt_song_action(req, res){
       });
       // results is an array consisting of messages collected during execution
       res.send(listLength);
+    });
+  });
+}
+
+function connect_zigbee(req, res){
+  var zighub_ip = "";
+  req.on('data', function (data) {
+      zighub_ip += data;
+  });
+  req.on('end', function () {
+      zig_hub_ip = zighub_ip;
+      let options = {
+        args: ['getapikey', zighub_ip]
+      };
+      ps.PythonShell.run('./dist/handle_zigbee_actions.py', options, function (err, results) {
+        if (err) throw err;
+        // results is an array consisting of messages collected during execution
+        res.send(results);
+        zigbeeToken = results[0];
+        console.log("Finished zigbee auth");
+      });
+  });
+}
+
+// name|action-variable
+// action, ip, key, id, brightness
+function zigbee_action(req, res){
+  var zigbee_act = "";
+  req.on('data', function (data) {
+      zigbee_act += data;
+  });
+  req.on('end', function () {
+    var action = zigbee_act.split("|")[1].split("-")[0].toLowerCase();
+    var variable = zigbee_act.split("|")[1].split("-")[1];
+    var name = zigbee_act.split("|")[0].replace(/_/g, " ");
+
+    let options_inr = {
+      args: [action, zig_hub_ip, zigbeeToken, name, variable]
+    };
+
+    console.log(options_inr);
+    ps.PythonShell.run('./dist/handle_zigbee_actions.py', options_inr, function (err, results_inr) {
+      if (err) throw err;
+      res.send(results_inr);
     });
   });
 }

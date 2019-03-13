@@ -1,5 +1,6 @@
 import IpDeviceDiscovery as IDD
 import BluetoothUtility as BU
+import ZigbeeUtility as ZU
 import sys
 
 def getIpDevices():
@@ -15,8 +16,13 @@ def getBluetoothDevices():
         print("Failed to discover devices")
     return devices
 
-def getZigbeeDevices():
-    return None
+def getZigbeeDevices(ip, key):
+    devices = []
+    try:
+        devices = ZU.getAllLights(ip, key)
+    except:
+        print("Failed to retrieve Zigbee devices")
+    return devices
 
 def main():
     if( len(sys.argv) != 1):
@@ -30,8 +36,7 @@ def main():
             allDevs = getBluetoothDevices()
 
         elif devicesToGet == "zigbee":
-            pass
-            #allDevs = getZigbeeDevices()
+            allDevs = getZigbeeDevices(sys.argv[2], sys.argv[3])
 
         elif devicesToGet == "all":
             allDevs = getIpDevices()

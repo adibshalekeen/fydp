@@ -82,38 +82,3 @@ def changeVolume(vol_level, device_name):
     print("here setting %s %s".format(changeVolume, vol_level))
     resp = subprocess.run(["amixer", "-D", "bluealsa", "sset", "\"%s - A2DP" % device_name, "%s%%" % vol_level])
     print(resp);
-#
-# class Bluetoothctl:
-#     mac_addr = '00:0C:8A:FE:85:72'
-#     # Need ' - A2DP' suffix
-#     dev_name = 'Bose Colour SoundLink - A2DP'
-#
-#     def __init__(self):
-#         out = subprocess.check_output("rfkill unblock bluetooth", shell = True)
-#         self.child = pexpect.spawn("bluetoothctl", echo = False)
-#         self.music_files = glob('./*.wav')
-#
-#     def get_output(self, command, pause = 0):
-#         """Run a command in bluetoothctl prompt, return output as a list of lines."""
-#         self.child.sendline(command)
-#         time.sleep(pause)
-#         start_failed = self.child.expect(["bluetooth", pexpect.EOF])
-#
-#         if start_failed:
-#             raise BluetoothctlError("Bluetoothctl failed after running " + command)
-#
-#         return self.child.before.split(b"\r\n")
-#
-#     def connect(self, mac_address):
-#         try:
-#             out = self.get_output("connect " + self.mac_addr, 2)
-#         except BluetoothctlError as e:
-#             print(e)
-#             return None
-#
-#     def play(self):
-#         args = 'bluealsa:DEV=%s,PROFILE=a2dp,HCI=hci0' % self.mac_addr
-#         self.playback = pexpect.spawn("aplay -D %s %s" % (args, self.music_files[0]), echo=False)
-#
-#     def change_volume(self, increment):
-#         pexec.spawn(["amixer -D bluealsa sset %s %s" % (self.dev_name, increment]))

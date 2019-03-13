@@ -14,7 +14,7 @@ for (var i = 0; i < fixed.length; i++) {
 document.getElementsByClassName('find-ip-devices')[0].addEventListener('click', display_ip_devices, false);
 document.getElementsByClassName('find-bluetooth-devices')[0].addEventListener('click', display_bluetooth_devices, false);
 document.getElementsByClassName('find-zigbee-devices')[0].addEventListener('click', display_zigbee_devices, false);
-document.getElementsByClassName('find-devices')[0].addEventListener('click', display_devices, false);
+// document.getElementsByClassName('find-devices')[0].addEventListener('click', display_devices, false);
 document.getElementsByClassName('update-saved-devices')[0].addEventListener('click', update_saved_devices, false);
 
 // Event handler for device mappings list
@@ -247,7 +247,7 @@ function update_saved_devices()
 function broadcast_ip_addr()
 {
   $(this)[0].classList.add("disabled_button");
-  // Get our IP to send
+  // TODO: Get our IP to send... delete this and just parse pageURL
   $.ajax({
     url: pageURL + "myIp",
     type: "GET",
@@ -266,8 +266,9 @@ function broadcast_ip_addr()
               url = pageURL + "connectBT";
               data = items[i+1];
             }
-            else if(items[i] === "ZIGBEE"){
-              continue;
+            else if(items[i-1] === "ZIGBEE"){
+              url = pageURL + "connectZigbee";
+              data = items[i];
             }
             else{
               url = "http://" + items[i] + ":2080/broadcastRx";

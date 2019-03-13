@@ -68,6 +68,8 @@ class MappingInterfaceCtrl:
                     if old_name in mapping and not old_name == '.' :
                         if(mapping[1] == "BLUETOOTH"):
                             map = mapping[0] + "|" + "BLUETOOTH" + "|" + mapping[2] + "|" + action
+                        elif(mapping[1] == "ZIGBEE"):
+                            map = mapping[2] + "|" + "ZIGBEE" + "|" + action
                         else:
                             map = mapping[1] + "|" + action
                         mapped_addresses.append(map)
