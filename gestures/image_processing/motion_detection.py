@@ -59,7 +59,17 @@ class MotionDetection:
             c = MotionDetection.centroid_from_contours(filtered_cntrs)
             x = c[0]/width
             y = c[1]/height
+
+        # for cntr in filtered_cntrs:
+        #     rect = cv2.minAreaRect(cntr)
+        #     box = cv2.boxPoints(rect)
+        #     box = np.int0(box)
+            # cv2.drawContours(current_frame,[box], 0,(0,0,255), 1)
+            # cv2.drawContours(output,[box], 0,(0,0,255), 1)
+
         cv2.drawContours(output, filtered_cntrs, -1, (0, 255, 0), 1)
+        # cv2.drawContours(current_frame, filtered_cntrs, -1, (0, 255, 0), 1)
+        # return current_frame, (x, y)
         return output, (x, y)
 
     @staticmethod
@@ -161,7 +171,7 @@ class MotionDetection:
 
     @staticmethod
     def add_centroid(centroids, centroid, count, timeout):
-        if centroid[0] != 0 and centroid[1] != 0:
+        if centroid[0]!=0 and centroid[1]!=0:
             x = np.concatenate((centroids[0][0], np.array([centroid[0]])))
             y = np.concatenate((centroids[0][1], np.array([centroid[1]])))
             centroids = np.array([[x, y]])
@@ -184,11 +194,12 @@ class MotionDetection:
                 if distance_travelled > min_len:
                     x_1 = x[0]
                     x_2 = x[len(x) - 1]
-                    y_1 = y[0]
-                    y_2 = y[len(y) - 1]
+                    z = np.polyfit(x,y,1)
+                    y_1 = z[0]*x_1 + z[1]
+                    y_2 = z[0]*x_2 + z[1]
                     point1 = (x_1, y_1)
                     point2 = (x_2, y_2)
-                return timeout, np.array([[[], []]]), (point1, point2)
+            return timeout, np.array([[[], []]]), (point1, point2)
         return count, centroids, (point2, point1)
 
     @staticmethod
