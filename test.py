@@ -7,7 +7,6 @@ import imutils
 import requests
 import multiprocessing
 
-first = True
 ip = "http://localhost:"
 port = "2081/sendMeMessage"
 url = ip + port
@@ -21,15 +20,15 @@ camera_params = {
 camera = api.Camera(5,
                     camera_params)
 
-mdp = MotionDetectionParameter
-
 persistent_args = {
-    "bgSubtractor": cv2.createBackgroundSubtractorMOG2(history=1),
+    "bgSubtractor": cv2.createBackgroundSubtractorMOG2(history=8),
     "all_centroids": np.array([[[], []]]),
+    "cooldown": False,
     "params": {MotionDetectionParameter.fps: 0,
-               MotionDetectionParameter.timeout: 10,
-               MotionDetectionParameter.max_len: 70,
-               MotionDetectionParameter.min_len: 5,
+               MotionDetectionParameter.timeout: 5,
+               MotionDetectionParameter.gesture_cooldown: 8,
+               MotionDetectionParameter.max_len: 10,
+               MotionDetectionParameter.min_len: 0.5,
                MotionDetectionParameter.path: (None, None),
                MotionDetectionParameter.angle: None,
                MotionDetectionParameter.path_encoding: None},
@@ -43,12 +42,17 @@ def show_camera_output(frame, **kwargs):
     fitted_line = kwargs["fitted_line"]
     selected_param = kwargs["selected_param"]
     params = kwargs["params"]
-
     frame = MotionDetection.add_frame_centroid(
         object_centroid, frame, (255, 255, 255))
     MotionDetection.add_frame_path_centroid(all_centroids, frame, (255, 255, 255))
     MotionDetection.draw_fitted_path(frame, fitted_line)
     MotionDetection.showconfig(frame, selected_param, params)
+    encoding = params[MotionDetectionParameter.path_encoding]
+    if encoding is not None:
+        gesture = MotionDetectionParameter.gesture_map[encoding]
+        font_size = frame.shape[0]/750
+        cv2.putText(frame, "Gesture" + ": " + gesture,
+                            (10, (len(params)+1)*int(font_size*40)), cv2.FONT_HERSHEY_SIMPLEX, font_size, (0,0,255), 1)
 
 def update_func(new_vals, args):
     args["all_centroids"] = new_vals[0]
@@ -62,6 +66,16 @@ def processing_func(fulres, tasks, args):
     count = args["count"]
     params = args["params"]
     selected_param = args["selected_param"]
+    if args["cooldown"]:
+        tasks.put(api.CameraWorkerTask(fulres,
+                                   img_processor=None))
+        if params[MotionDetectionParameter.gesture_cooldown] > 0:
+            params[MotionDetectionParameter.gesture_cooldown] -= 1
+            return all_centroids, count, params, selected_param
+        else:
+            params[MotionDetectionParameter.gesture_cooldown] = 10
+            args["cooldown"] = False
+
 
     downresScale = 2
     stime = time.time()
@@ -82,12 +96,12 @@ def processing_func(fulres, tasks, args):
     if (fitted_line[0] is not None):
             params[MotionDetectionParameter.path], params[MotionDetectionParameter.angle], params[MotionDetectionParameter.path_encoding] = MotionDetection.get_fitted_path_stat(fulres, fitted_line)
             gesture = MotionDetectionParameter.gesture_map[params[MotionDetectionParameter.path_encoding]]
+            # print(gesture)
             try:
-                requests.post(url=url, data=gesture + "|555")
+                requests.post(url=url, data=gesture)
             except Exception:
-                print("Victor done goofed")
-            print(params)
-
+                print(gesture)
+            args["cooldown"] = True
     tasks.put(api.CameraWorkerTask(fulres,
                                    img_processor=show_camera_output,
                                    object_centroid=object_centroid,
@@ -95,9 +109,16 @@ def processing_func(fulres, tasks, args):
                                    fitted_line=fitted_line,
                                    selected_param=selected_param,
                                    params=params))
-    
     params[MotionDetectionParameter.fps] = int(1 / (time.time() - stime))
-    print('FPS {:.1f}'.format(1 / (time.time() - stime)))
     return all_centroids, count, params, selected_param
 
 camera.start_processing(processing_func, update_func, persistent_args)
+
+# mic = api.Microphone()
+# print("Recording")
+# start = time.time()
+# audio = mic.listen(2)
+# print("Done")
+# mic.recognize()
+# print("It took: " + str(time.time() - start))
+# mic.close()
