@@ -8,7 +8,7 @@ import requests
 import multiprocessing
 
 ip = "http://localhost:"
-port = "2081/sendMeMessage"
+port = "2080/sendMessage"
 url = ip + port
 http_params = {'gesture': None}
     
@@ -98,7 +98,7 @@ def processing_func(fulres, tasks, args):
             gesture = MotionDetectionParameter.gesture_map[params[MotionDetectionParameter.path_encoding]]
             # print(gesture)
             try:
-                requests.post(url=url, data=gesture)
+                requests.post(url=url, data=gesture, timeout=2)
             except Exception:
                 print(gesture)
             args["cooldown"] = True
