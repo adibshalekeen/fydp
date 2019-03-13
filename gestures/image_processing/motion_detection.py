@@ -17,15 +17,15 @@ class MotionDetectionParameter():
     path_encoding = 6
     gesture_cooldown = 10
     gesture_map = {12:"Up", 
-                   11:"Top Right",
-                   10:"Right",
-                   20:"Right",
-                   21:"Bottom Right",
+                   11:"TopLeft",
+                   10:"Left",
+                   20:"Left",
+                   21:"BottomLeft",
                    22:"Down",
-                   13:"Top Left",
-                   24:"Left",
-                   14:"Left",
-                   23:"Bottom Left"}
+                   13:"TopRight",
+                   24:"Right",
+                   14:"Right",
+                   23:"BottomRight"}
 
 class MotionDetection:
     @staticmethod
@@ -49,7 +49,7 @@ class MotionDetection:
         filtered_cntrs = []
         if len(contours) > 0:
             for i in range(0, len(contours)):
-                if cv2.contourArea(contours[i]) > (500 / (2 ** (downresScale + 2))):
+                if cv2.contourArea(contours[i]) > (750 / (2 ** (downresScale + 2))):
                     filtered_cntrs.append(contours[i])
         x = 0
         y = 0
