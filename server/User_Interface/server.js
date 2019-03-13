@@ -89,6 +89,11 @@ function get_devices(req, res) {
 
 // Devices will send packet of format "sourceIP|action"
 function send_message(req, res) {
+  if(hub_ip === "8.8.8.8"){
+    console.log("Broadcast IP from hub first");
+    res.send("Need broadcast");
+    return;
+  }
   var message = "";
   req.on('data', function (data) {
       message += data;
