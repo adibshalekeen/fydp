@@ -8,7 +8,12 @@ def getIpDevices():
     return devices
 
 def getBluetoothDevices():
-    return BU.discover()
+    devices = []
+    try:
+        devices = BU.discover()
+    except:
+        print("Failed to discover devices")
+    return devices
 
 def getZigbeeDevices():
     return None

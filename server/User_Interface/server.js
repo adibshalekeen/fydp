@@ -22,18 +22,22 @@ app.use(morgan('dev')) // logging
 
 var hub_ip = "8.8.8.8";
 var portNum = "2080";
+var currSongIndex = 0;
+var currentVolume = 70;
 
 /*GET REQUESTS*/
 const ps = require('python-shell');
 app.get('/myIp', get_my_ip);
 app.post('/getDevices', get_devices);
 app.post('/sendMessage', send_message);
+app.post('/hubPointMessage', hub_point_message)
 app.post('/endPointMessage', end_point_message);
 app.post('/getMappings', get_mappings);
 app.post('/saveMappings', save_mappings);
 app.post('/sendMeMessage', send_me_message);
 app.post('/broadcastRx', receive_hub_ip);
 app.post('/connectBT', connect_bt);
+app.post('/btSongAction', bt_song_action);
 
 /*START GET REQUESTS*/
 function get_my_ip(req, res){
@@ -66,6 +70,7 @@ function get_devices(req, res) {
   });
 }
 
+// Devices will send packet of format "sourceIP|action"
 function send_message(req, res) {
   var message = "";
   req.on('data', function (data) {
@@ -83,55 +88,102 @@ function send_message(req, res) {
       getResponse.on('data', function(chunk) {
         ip_self += chunk;
       }).on('end', function() {
+        // Calculate my own IP to send with the packet
         var self_ip = ip_self.substr(2, ip_self.length - 4);
-        // Received message from sender
-        let options = {
-          args: ['send_message', "act", self_ip + "|" + message]
-        };
-        // Run mapping check to see if the incoming message is valid and maps to a destination
-        // and check what devices to send to
-        ps.PythonShell.run('./dist/MappingInterfaceCtrl.py', options, function(err, resp){
-          if(err) throw err;
-          // send response to free the client
-          res.send("Routed to: " + resp);
-          if(resp)
-          {
-            var routed_msg = resp.toString().split(',');
+        var packet_to_send = self_ip + "|" + message;
 
-            for(var i = 0; i < routed_msg.length; i++)
-            {
-              var dest_ip = routed_msg[i].split('|')[0];
-              var dest_act = routed_msg[i].split('|')[1];
-
-              // host is the destination of the message and port number is set to our default
-              // If we are to send to a third party manufacturer we will have pre-defined settings
-              // and will set them here
-              dest_ip = (hub_ip != "8.8.8.8") ? hub_ip : dest_ip;
-              var post_options = {
-                  host: dest_ip,//dest_ip
-                  port: portNum,
-                  path: '/endPointMessage',
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/x-www-form-urlencoded',
-                      'Content-Length': dest_act.length
-                  }
-              };
-              // Set up the request
-              var post_req = http.request(post_options, function(res) {
-                  res.setEncoding('utf8');
-                  res.on('data', function (chunk) {
-                      console.log('Response: ' + chunk);
-                  });
-              });
-              // post the data
-              post_req.write(dest_act);
-              post_req.end();
+        // Construct the post message to the central hub
+        // Make sure to broadcast IP before this!
+        var post_options = {
+            host: hub_ip,//dest_ip
+            port: portNum,
+            path: '/hubPointMessage',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': packet_to_send.length
             }
-          }
-        })
+        };
+
+        // Set up the request
+        var post_req = http.request(post_options, function(res) {
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                console.log('Response: ' + chunk);
+            });
+        });
+        // post the data
+        post_req.write(packet_to_send);
+        post_req.end();
       });
     });
+  });
+}
+
+// Post a message "192.168.0.54|RIGHT" being "sourceIP|action"
+function hub_point_message(req, res){
+  var message = "";
+  req.on('data', function (data) {
+      message += data;
+  });
+  req.on('end', function () {
+    // Received message from sender
+    let options = {
+      args: ['send_message', "act", message]
+    };
+    // Run mapping check to see if the incoming message is valid and maps to a destination
+    // and check what devices to send to
+    ps.PythonShell.run('./dist/MappingInterfaceCtrl.py', options, function(err, resp){
+      if(err) throw err;
+      // send response to free the client
+      res.send("Routed to: " + resp);
+      if(resp){
+        var routed_msg = resp.toString().split(',');
+
+        for(var i = 0; i < routed_msg.length; i++){
+          var dest_addr = "";
+          var dest_act = "";
+          var dest_name = "";
+          var second_field = routed_msg[i].split('|')[1];
+
+          if(second_field != "BLUETOOTH" && second_field != "ZIGBEE"){
+            continue;
+            // handle the http calls
+          }
+          else{
+            // dest_name = routed_msg[i].split('|')[0];
+            // dest_addr = routed_msg[i].split('|')[1];
+            dest_act = routed_msg[0].replace("BLUETOOTH|", "");//[i].split('|')[2];
+            console.log(dest_act);
+
+            var path = (second_field === "BLUETOOTH") ? "/btSongAction" : "/zigbeeAction";
+            // host is the destination of the message and port number is set to our default
+            // If we are to send to a third party manufacturer we will have pre-defined settings
+            // and will set them here
+            var post_options = {
+                host: "localhost", //dest_ip
+                port: portNum,
+                path: path,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Length': dest_act.length
+                }
+            };
+            // Set up the request
+            var post_req = http.request(post_options, function(res) {
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    console.log('Response: ' + chunk);
+                });
+            });
+            // post the data
+            post_req.write(dest_act);
+            post_req.end();
+          }
+        }
+      }
+    })
   });
 }
 
@@ -218,7 +270,63 @@ function connect_bt(req, res){
         if (err) throw err;
         // results is an array consisting of messages collected during execution
         res.send(results);
+        console.log("Finished connectBT");
       });
+  });
+}
+
+// Post data will be like "AA:11:AA:11:AA:11|playsong|1"
+// next and previous song: nextsong|2C:41:A1:07:71:E0
+// Only stop song doesnt need mac address
+function bt_song_action(req, res){
+  var bt_song_act = "";
+  req.on('data', function (data) {
+      bt_song_act += data;
+  });
+  req.on('end', function () {
+    let options = {
+      args: ["getsonglistlength"]
+    };
+    ps.PythonShell.run('./dist/handle_bluetooth_actions.py', options, function (err, listLength) {
+      if (err) throw err;
+      var action = bt_song_act.split("|")[2].split("-")[0].toLowerCase();
+      var mac = bt_song_act.split("|")[1];
+      var name = bt_song_act.split("|")[0].replace("_", " ");
+      var variable = bt_song_act.split("|")[2].split("-")[1];
+
+      var variable = 0;
+      if(action.includes("song"))
+      {
+        if(action === "prevsong")
+          variable = (currSongIndex - 1 >= 0) ? currSongIndex - 1 :  listLength - 1;
+        else if(action === "nextsong")
+          variable = (currSongIndex + 1 < listLength) ? currSongIndex + 1 : 0;
+        currSongIndex = variable;
+      }
+      else if (action.includes("volume"))
+      {
+        if(action === "volumeup")
+          variable = currentVolume + 10;
+        else if(action === "volumedown")
+        {
+          variable = currentVolume - 10;
+          if(variable < 50)
+            variable = 50;
+        }
+        currentVolume = variable;
+      }
+
+      let options_inr = {
+        args: [action, variable, mac]
+      };
+
+      console.log(options_inr);
+      ps.PythonShell.run('./dist/handle_bluetooth_actions.py', options_inr, function (err, results_inr) {
+        if (err) throw err;
+      });
+      // results is an array consisting of messages collected during execution
+      res.send(listLength);
+    });
   });
 }
 /*END POST REQUESTS*/

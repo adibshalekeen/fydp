@@ -66,7 +66,10 @@ class MappingInterfaceCtrl:
                 for dest in dest_name:
                     old_name, action = dest.split("|")
                     if old_name in mapping and not old_name == '.' :
-                        map = mapping[1] + "|" + action
+                        if(mapping[1] == "BLUETOOTH"):
+                            map = mapping[0] + "|" + "BLUETOOTH" + "|" + mapping[2] + "|" + action
+                        else:
+                            map = mapping[1] + "|" + action
                         mapped_addresses.append(map)
         return mapped_addresses
 
