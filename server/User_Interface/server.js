@@ -276,7 +276,7 @@ function connect_bt(req, res){
 }
 
 // Post data will be like "AA:11:AA:11:AA:11|playsong|1"
-// next and previous song: nextsong|2C:41:A1:07:71:E0
+// next and previous song: UE BOOM 2|2C:41:A1:07:71:E0|VOLUMEUP
 // Only stop song doesnt need mac address
 function bt_song_action(req, res){
   var bt_song_act = "";
@@ -291,7 +291,7 @@ function bt_song_action(req, res){
       if (err) throw err;
       var action = bt_song_act.split("|")[2].split("-")[0].toLowerCase();
       var mac = bt_song_act.split("|")[1];
-      var name = bt_song_act.split("|")[0].replace("_", " ");
+      var name = bt_song_act.split("|")[0].replace(/_/g, " ");
       var variable = bt_song_act.split("|")[2].split("-")[1];
 
       var variable = 0;
@@ -306,13 +306,17 @@ function bt_song_action(req, res){
       else if (action.includes("volume"))
       {
         if(action === "volumeup")
-          variable = currentVolume + 10;
+        {
+          variable = currentVolume + 10
+          variable = (variable > 100) ? 100 : variable;
+
+        }
         else if(action === "volumedown")
         {
           variable = currentVolume - 10;
-          if(variable < 50)
-            variable = 50;
+          variable = (variable < 50) ? 50 : variable;
         }
+        mac = name;
         currentVolume = variable;
       }
 

@@ -80,7 +80,8 @@ def stopSong():
 # amixer -D bluealsa sset "Bose QuietComfort 35 - A2DP" 50%
 def changeVolume(vol_level, device_name):
     print("here setting %s %s".format(changeVolume, vol_level))
-    subprocess.run(["amixer", "-D", "bluealsa", "sset", "\"%s - A2DP" % device_name, "%s%%" % vol_level])
+    resp = subprocess.run(["amixer", "-D", "bluealsa", "sset", "\"%s - A2DP" % device_name, "%s%%" % vol_level])
+    print(resp);
 #
 # class Bluetoothctl:
 #     mac_addr = '00:0C:8A:FE:85:72'
