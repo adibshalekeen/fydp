@@ -26,9 +26,9 @@ persistent_args = {
     "cooldown": False,
     "params": {MotionDetectionParameter.fps: 0,
                MotionDetectionParameter.timeout: 5,
-               MotionDetectionParameter.gesture_cooldown: 3,
-               MotionDetectionParameter.max_len: 6,
-               MotionDetectionParameter.min_len: 0.5,
+               MotionDetectionParameter.gesture_cooldown: 20,
+               MotionDetectionParameter.max_len: 8,
+               MotionDetectionParameter.min_len: 0.25,
                MotionDetectionParameter.path: (None, None),
                MotionDetectionParameter.angle: None,
                MotionDetectionParameter.path_encoding: None},
@@ -75,7 +75,6 @@ def processing_func(fulres, tasks, args):
         else:
             params[MotionDetectionParameter.gesture_cooldown] = 10
             args["cooldown"] = False
-
 
     downresScale = 2
     stime = time.time()
