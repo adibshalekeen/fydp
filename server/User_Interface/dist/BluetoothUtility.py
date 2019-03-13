@@ -61,7 +61,7 @@ def connectDevice(mac_addr):
 # aplay -D bluealsa:HCI=hci0,DEV=2C:41:A1:07:71:E0,PROFILE=a2dp PinkPanther30.wav
 def playSong(song_num, mac_addr):
     song_number = int(song_num)
-    music_files = glob('./dist/*.wav')
+    music_files = glob('./dist/wavFiles/*.wav')
     dev = "bluealsa:HCI=hci0,DEV=%s,PROFILE=a2dp" % mac_addr
 
     if song_number > (len(music_files) - 1) or (song_number < 0):
@@ -72,7 +72,7 @@ def playSong(song_num, mac_addr):
     playback = subprocess.run(["aplay", "-D", dev, music_files[song_number][2:], " &"])
 
 def getSongListLength():
-    print(len(glob('./dist/*.wav')))
+    print(len(glob('./dist/wavFiles/*.wav')))
 
 def stopSong():
     playback = subprocess.run(["pkill", "aplay"])
