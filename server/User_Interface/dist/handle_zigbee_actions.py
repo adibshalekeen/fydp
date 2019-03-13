@@ -12,10 +12,19 @@ def main():
             except:
                 print("Failed to get key")
         elif action == "lighton":
-            ZU.turnOnLight(sys.argv[2], sys.argv[3], sys.argv[4])
+            try:
+                ZU.turnOnLight(sys.argv[2], sys.argv[3], sys.argv[4])
+            except:
+                print("Failed to turn on light")
         elif action == "lightoff":
-            ZU.turnOffLight(sys.argv[2], sys.argv[3], sys.argv[4])
+            try:
+                ZU.turnOffLight(sys.argv[2], sys.argv[3], sys.argv[4])
+            except:
+                print("Failed to turn on light")
         elif action == "dimlight":
-            ZU.dimLight(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], 30)
+            try:
+                ZU.dimLight(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], 30)
+            except:
+                print("Failed to turn on light")
 
 main()

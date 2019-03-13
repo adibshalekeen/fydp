@@ -150,6 +150,8 @@ function hub_point_message(req, res){
   });
   req.on('end', function () {
     // Received message from sender
+    message = message.toUpperCase();
+    console.log(message);
     let options = {
       args: ['send_message', "act", message]
     };
@@ -174,7 +176,7 @@ function hub_point_message(req, res){
           }
           else{
             dest_act = routed_msg[i].replace("BLUETOOTH|", "");
-            dest_act = routed_msg[i].replace("ZIGBEE|", "");
+            dest_act = dest_act.replace("ZIGBEE|", "");
             console.log(dest_act + "hubPtMessage");
 
             var path = (second_field === "BLUETOOTH") ? "/btSongAction" : "/zigbeeAction";
@@ -315,6 +317,7 @@ function bt_song_action(req, res){
       var name = bt_song_act.split("|")[0].replace(/_/g, " ");
       var variable = bt_song_act.split("|")[2].split("-")[1];
 
+      console.log(bt_song_act + " Action BT");
       var variable = 0;
       if(action.includes("song"))
       {
@@ -383,6 +386,12 @@ function zigbee_action(req, res){
       zigbee_act += data;
   });
   req.on('end', function () {
+    if(zig_hub_ip === "1.1.1.1")
+    {
+      console.log("Initialize the hub and zigbee devices");
+      res.send("Failed to init zigbee");
+      return;
+    }
     var action = zigbee_act.split("|")[1].split("-")[0].toLowerCase();
     var variable = zigbee_act.split("|")[1].split("-")[1];
     var name = zigbee_act.split("|")[0].replace(/_/g, " ");
