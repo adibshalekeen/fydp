@@ -1,5 +1,6 @@
 from gestures import api
 from gestures.image_processing import MotionDetection, MotionDetectionParameter
+from audio_processing import HotWordDetection
 import cv2
 import time
 import numpy as np
@@ -11,19 +12,28 @@ ip = "http://localhost:"
 port = "2080/sendMessage"
 url = ip + port
 http_params = {'gesture': None}
-    
+
+LIBRARY_PATH =  './audio_processing/libpv_porcupine.so'
+MODEL_FILE_PATH = './audio_processing/porcupine_params.pv'
+KEYWORD_FILE_PATHS = ['./audio_processing/keyword_files/bumblebee_raspberrypi.ppn', './audio_processing/keyword_files/grapefruit_raspberrypi.ppn']
+
 camera_params = {
     "res":[640, 480],
     "fps":90
 }
 
-camera = api.Camera(5,
-                    camera_params)
+camera = api.Camera(5, camera_params)
+
+wordDetector = HotWordDetection(
+    library_path=LIBRARY_PATH,
+    model_file_path=MODEL_FILE_PATH,
+    keyword_file_paths=KEYWORD_FILE_PATHS
+)
 
 persistent_args = {
     "bgSubtractor": cv2.createBackgroundSubtractorMOG2(history=8),
     "all_centroids": np.array([[[], []]]),
-    "cooldown": False,
+    "cooldown": True,
     "params": {MotionDetectionParameter.fps: 0,
                MotionDetectionParameter.timeout: 5,
                MotionDetectionParameter.gesture_cooldown: 20,
@@ -66,15 +76,20 @@ def processing_func(fulres, tasks, args):
     count = args["count"]
     params = args["params"]
     selected_param = args["selected_param"]
+
+    # if args["cooldown"]:
+    #     tasks.put(api.CameraWorkerTask(fulres,
+    #                                img_processor=None))
+    #     if params[MotionDetectionParameter.gesture_cooldown] > 0:
+    #         params[MotionDetectionParameter.gesture_cooldown] -= 1
+    #         return all_centroids, count, params, selected_param
+    #     else:
+    #         params[MotionDetectionParameter.gesture_cooldown] = 10
+    #         args["cooldown"] = False
+
     if args["cooldown"]:
-        tasks.put(api.CameraWorkerTask(fulres,
-                                   img_processor=None))
-        if params[MotionDetectionParameter.gesture_cooldown] > 0:
-            params[MotionDetectionParameter.gesture_cooldown] -= 1
-            return all_centroids, count, params, selected_param
-        else:
-            params[MotionDetectionParameter.gesture_cooldown] = 10
-            args["cooldown"] = False
+        tasks.put(api.CameraWorkerTask(fulres, img_processor=None))
+        return all_centroids, count, params, selected_param
 
     downresScale = 2
     stime = time.time()
@@ -111,7 +126,9 @@ def processing_func(fulres, tasks, args):
     params[MotionDetectionParameter.fps] = int(1 / (time.time() - stime))
     return all_centroids, count, params, selected_param
 
-camera.start_processing(processing_func, update_func, persistent_args)
+# camera.start_processing(processing_func, update_func, persistent_args)
+
+wordDetector.run(camera, processing_func, update_func, persistent_args)
 
 # mic = api.Microphone()
 # print("Recording")
