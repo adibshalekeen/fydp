@@ -33,7 +33,7 @@ wordDetector = HotWordDetection(
 persistent_args = {
     "bgSubtractor": cv2.createBackgroundSubtractorMOG2(history=8),
     "all_centroids": np.array([[[], []]]),
-    "cooldown": True,
+    "active": None,
     "params": {MotionDetectionParameter.fps: 0,
                MotionDetectionParameter.timeout: 5,
                MotionDetectionParameter.gesture_cooldown: 20,
@@ -87,7 +87,7 @@ def processing_func(fulres, tasks, args):
     #         params[MotionDetectionParameter.gesture_cooldown] = 10
     #         args["cooldown"] = False
 
-    if args["cooldown"]:
+    if args["active"] is None:
         tasks.put(api.CameraWorkerTask(fulres, img_processor=None))
         return all_centroids, count, params, selected_param
 
@@ -110,12 +110,13 @@ def processing_func(fulres, tasks, args):
     if (fitted_line[0] is not None):
             params[MotionDetectionParameter.path], params[MotionDetectionParameter.angle], params[MotionDetectionParameter.path_encoding] = MotionDetection.get_fitted_path_stat(fulres, fitted_line)
             gesture = MotionDetectionParameter.gesture_map[params[MotionDetectionParameter.path_encoding]]
-            # print(gesture)
+            data = args["active"] + '|' + gesture
+            print(data)
             try:
-                requests.post(url=url, data=gesture, timeout=2)
+                requests.post(url=url, data=data, timeout=2)
             except Exception:
                 print(gesture)
-            args["cooldown"] = True
+            args["active"] = None
     tasks.put(api.CameraWorkerTask(fulres,
                                    img_processor=show_camera_output,
                                    object_centroid=object_centroid,

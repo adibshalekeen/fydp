@@ -64,8 +64,8 @@ class HotWordDetection(Thread):
                 elif num_keywords > 1 and result >= 0:
                     print('[%s] detected %s' % (str(datetime.now()), keyword_names[result]))
                     # or add it here if you use multiple keywords
-                    persistent_args["cooldown"] = False
-                    print(persistent_args)
+                    if (persistent_args["active"] is None):
+                        persistent_args["active"] = keyword_names[result]
 
                 if self._output_path is not None:
                     self._recorded_frames.append(pcm)
