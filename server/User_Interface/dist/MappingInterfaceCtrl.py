@@ -129,7 +129,8 @@ def main():
             mapDevices = MappingInterfaceCtrl("./dist/devices.csv")
             # We defaulted to create the mapping reader, must make an action reader here
             contents = sys.argv[3]
-            s_ip, s_act = contents.split("|")
+            s_ip, s_gest, s_action = contents.split("|")
+            s_act = s_gest.upper() + "-" + s_action.upper()
             s_name = mapDevices.get_mapped_address(s_ip)
             if(s_name):
                 dest_addrs = mapCont.get_mapped_actions(s_name, s_act)
