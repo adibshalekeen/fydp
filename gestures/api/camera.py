@@ -32,6 +32,7 @@ class CameraWorkerTask(object):
     def __call__(self):
         if self._img_processor is not None:
             self._img_processor(self._frame, **self._args)
+        cv2.namedWindow("Cam",cv2.WND_PROP_FULLSCREEN)
         cv2.imshow("Cam", self._frame)
         cv2.waitKey(1)
 
