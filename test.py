@@ -15,8 +15,8 @@ http_params = {'gesture': None}
 
 LIBRARY_PATH =  './audio_processing/libpv_porcupine.so'
 MODEL_FILE_PATH = './audio_processing/porcupine_params.pv'
-#KEYWORD_FILE_PATHS = ['./audio_processing/keyword_files/bumblebee_raspberrypi.ppn', './audio_processing/keyword_files/grapefruit_raspberrypi.ppn']
-KEYWORD_FILE_PATHS = ['./audio_processing/keyword_files/kitchen_linux.ppn', './audio_processing/keyword_files/bedroom_linux.ppn']
+KEYWORD_FILE_PATHS = ['./audio_processing/keyword_files/bumblebee_raspberrypi.ppn', './audio_processing/keyword_files/grapefruit_raspberrypi.ppn']
+# KEYWORD_FILE_PATHS = ['./audio_processing/keyword_files/kitchen_linux.ppn', './audio_processing/keyword_files/bedroom_linux.ppn']
 
 camera_params = {
     "res":[640, 480],
