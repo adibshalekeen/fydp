@@ -31,14 +31,14 @@ wordDetector = HotWordDetection(
 )
 
 persistent_args = {
-    "bgSubtractor": cv2.createBackgroundSubtractorMOG2(history=8),
+    "bgSubtractor": cv2.createBackgroundSubtractorMOG2(history=4),
     "all_centroids": np.array([[[], []]]),
     "active": None,
     "params": {MotionDetectionParameter.fps: 0,
                MotionDetectionParameter.timeout: 5,
                MotionDetectionParameter.gesture_cooldown: 20,
                MotionDetectionParameter.max_len: 8,
-               MotionDetectionParameter.min_len: 0.25,
+               MotionDetectionParameter.min_len: 0.15,
                MotionDetectionParameter.path: (None, None),
                MotionDetectionParameter.angle: None,
                MotionDetectionParameter.path_encoding: None},
@@ -77,17 +77,13 @@ def processing_func(fulres, tasks, args):
     params = args["params"]
     selected_param = args["selected_param"]
 
-    # if args["cooldown"]:
-    #     tasks.put(api.CameraWorkerTask(fulres,
-    #                                img_processor=None))
-    #     if params[MotionDetectionParameter.gesture_cooldown] > 0:
-    #         params[MotionDetectionParameter.gesture_cooldown] -= 1
-    #         return all_centroids, count, params, selected_param
-    #     else:
-    #         params[MotionDetectionParameter.gesture_cooldown] = 10
-    #         args["cooldown"] = False
-
     if args["active"] is None:
+        encoding = params[MotionDetectionParameter.path_encoding]
+        if encoding is not None:
+            gesture = MotionDetectionParameter.gesture_map[encoding]
+            font_size = fulres.shape[0]/750
+            cv2.putText(fulres, "Gesture" + ": " + gesture,
+                                (40, 100), cv2.FONT_HERSHEY_SIMPLEX, font_size, (0,255,0), 1)
         tasks.put(api.CameraWorkerTask(fulres, img_processor=None))
         return all_centroids, count, params, selected_param
 
