@@ -32,6 +32,7 @@ def getAllLights(ip, key):
     response = requests.get(url)
     if response is not None:
         data = response.json()
+        print(data)
         lights = []
         for light in data:
             lights.append([data[str(light)]["name"], "ZIGBEE", light, data[str(light)]["manufacturername"]])
@@ -44,6 +45,7 @@ def turnOnLight(ip, key, id):
     response = requests.put(url, headers={'content-type': 'raw'}, data=raw_data, timeout=2)
     if response is not None:
         data = response.json()
+        print(data)
 
 def turnOffLight(ip, key, id):
     url = "http://{}:8080{}/{}{}/{}/{}".format(ip, eps["getApi"], key, eps["getLights"], id, eps["setLights"])
@@ -51,6 +53,7 @@ def turnOffLight(ip, key, id):
     response = requests.put(url, headers={'content-type': 'raw'}, data=raw_data, timeout=2)
     if response is not None:
         data = response.json()
+        print(data)
 
 def dimLight(ip, key, id, brightness, transition_time):
     url = "http://{}:8080{}/{}{}/{}/{}".format(ip, eps["getApi"], key, eps["getLights"], id, eps["setLights"])
@@ -76,13 +79,16 @@ if __name__ == '__main__':
 
     for light in lights:
         print(light[2])
-        turnOnLight(ip, key, light[2])
+        turnOnLight(ip, key, str(light[2]))
 
-    time.sleep(2)
+
+    changeLightColor(ip, key, "2", 100, 255, 210, 2)
+
+    time.sleep(15)
 
     for light in lights:
         print(light[2])
-        turnOffLight(ip, key, light[2])
+        turnOffLight(ip, key, str(light[2]))
 
     time.sleep(2)
 
@@ -95,3 +101,4 @@ if __name__ == '__main__':
     for light in lights:
         print(light[2])
         turnOffLight(ip, key, light[2])
+    
