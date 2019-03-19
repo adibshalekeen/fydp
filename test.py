@@ -31,14 +31,18 @@ wordDetector = HotWordDetection(
 )
 
 persistent_args = {
-    "bgSubtractor": cv2.createBackgroundSubtractorMOG2(history=8),
+    "bgSubtractor": cv2.createBackgroundSubtractorMOG2(history=1),
     "all_centroids": np.array([[[], []]]),
     "active": None,
+    "start_dropout": 0,
+    "end_dropout": 0,
+    "avg_centroid_distance": None,
     "params": {MotionDetectionParameter.fps: 0,
                MotionDetectionParameter.timeout: 5,
                MotionDetectionParameter.gesture_cooldown: 20,
                MotionDetectionParameter.max_len: 8,
                MotionDetectionParameter.min_len: 0.25,
+               MotionDetectionParameter.min_centroid_count: 10,
                MotionDetectionParameter.path: (None, None),
                MotionDetectionParameter.angle: None,
                MotionDetectionParameter.path_encoding: None},
@@ -69,10 +73,16 @@ def update_func(new_vals, args):
     args["count"] = new_vals[1]
     args["params"] = new_vals[2]
     args["selected_param"] = new_vals[3]
+    args["avg_centroid_distance"] = new_vals[4]
 
 def processing_func(fulres, tasks, args):
     bgSubtractor = args["bgSubtractor"]
     all_centroids = args["all_centroids"]
+
+    start_dropout = args["start_dropout"]
+    end_dropout = args["end_dropout"]
+    avg_centroid_distance = args["avg_centroid_distance"]
+
     count = args["count"]
     params = args["params"]
     selected_param = args["selected_param"]
@@ -89,23 +99,31 @@ def processing_func(fulres, tasks, args):
 
     if args["active"] is None:
         tasks.put(api.CameraWorkerTask(fulres, img_processor=None))
-        return all_centroids, count, params, selected_param
+        return all_centroids, count, params, selected_param, avg_centroid_distance
 
     downresScale = 2
     stime = time.time()
     frame = MotionDetection.downResImage(fulres, downresScale)
 
-    foreground, object_centroid = MotionDetection.process_image_contours(
+    object_centroid = MotionDetection.process_image_contours(
         frame, bgSubtractor, downresScale)
 
-    count, all_centroids = MotionDetection.add_centroid(
-        all_centroids, object_centroid, count, params[MotionDetectionParameter.timeout])
+    count, all_centroids, avg_centroid_distance = MotionDetection.add_centroid(
+        all_centroids, 
+        object_centroid, 
+        count, 
+        params[MotionDetectionParameter.timeout], 
+        avg_centroid_distance)
 
-    count, all_centroids, fitted_line = MotionDetection.test_path(
+    count, all_centroids, fitted_line, avg_centroid_distance = MotionDetection.test_path(
         all_centroids,
         count, params[MotionDetectionParameter.timeout],
         params[MotionDetectionParameter.max_len],
-        params[MotionDetectionParameter.min_len])
+        params[MotionDetectionParameter.min_len],
+        params[MotionDetectionParameter.min_centroid_count],
+        start_dropout, 
+        end_dropout, 
+        avg_centroid_distance)
 
     if (fitted_line[0] is not None):
             params[MotionDetectionParameter.path], params[MotionDetectionParameter.angle], params[MotionDetectionParameter.path_encoding] = MotionDetection.get_fitted_path_stat(fulres, fitted_line)
@@ -125,17 +143,8 @@ def processing_func(fulres, tasks, args):
                                    selected_param=selected_param,
                                    params=params))
     params[MotionDetectionParameter.fps] = int(1 / (time.time() - stime))
-    return all_centroids, count, params, selected_param
+    return all_centroids, count, params, selected_param, avg_centroid_distance
 
 # camera.start_processing(processing_func, update_func, persistent_args)
 
 wordDetector.run(camera, processing_func, update_func, persistent_args)
-
-# mic = api.Microphone()
-# print("Recording")
-# start = time.time()
-# audio = mic.listen(2)
-# print("Done")
-# mic.recognize()
-# print("It took: " + str(time.time() - start))
-# mic.close()
