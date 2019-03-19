@@ -14,7 +14,7 @@ for (var i = 0; i < fixed.length; i++) {
 document.getElementsByClassName('find-ip-devices')[0].addEventListener('click', display_ip_devices, false);
 document.getElementsByClassName('find-bluetooth-devices')[0].addEventListener('click', display_bluetooth_devices, false);
 document.getElementsByClassName('find-zigbee-devices')[0].addEventListener('click', display_zigbee_devices, false);
-document.getElementsByClassName('find-devices')[0].addEventListener('click', display_devices, false);
+// document.getElementsByClassName('find-devices')[0].addEventListener('click', display_devices, false);
 document.getElementsByClassName('update-saved-devices')[0].addEventListener('click', update_saved_devices, false);
 
 // Event handler for device mappings list
@@ -48,10 +48,11 @@ function clickResp()
 
 function dblClickResp()
 {
-  var address = prompt("Please enter the new value", this.innerHTML);
+  var address = prompt("Please enter the new value (case-sensitive)", this.innerHTML);
   if(address)
   {
-    this.innerHTML = (address) ? address.toUpperCase() : ".";
+    // this.innerHTML = (address) ? address.toUpperCase() : ".";
+    this.innerHTML = (address) ? address : ".";
     if($(this)[0].parentNode.parentNode.id.indexOf("map") >= 0)
     {
       document.getElementsByClassName("save-mappings")[0].classList.remove("disabled_button");
@@ -71,7 +72,7 @@ function autoAdd()
   if(result)
   {
     //document.getElementsByClassName("load-mappings")[0].click();
-    var deviceData = $(this)[0].parentElement.innerText.split(/\s+/).slice(0, 2);
+    var deviceData = $(this)[0].parentElement.innerText.split(/\t/).slice(0, 3);
     add_row("mapping-table", true, deviceData);
     document.getElementsByClassName("save-mappings")[0].classList.remove("disabled_button");
     var clickable_items = document.getElementsByClassName('clickable');
@@ -123,7 +124,7 @@ function add_row(element_id, clickable, fields = null)
 
   var content = [columns];
   // Fix this not displaying on the table
-  var content = (fields) ? [".", fields[0], fields[1]] : Array(columns).fill(".");
+  var content = (fields) ? [fields[2], fields[0], fields[1]] : Array(columns).fill(".");
   html += "<tr>";
   for( var i = 0; i < columns; i++)
   {
@@ -245,7 +246,8 @@ function update_saved_devices()
 
 function broadcast_ip_addr()
 {
-  // Get our IP to send
+  $(this)[0].classList.add("disabled_button");
+  // TODO: Get our IP to send... delete this and just parse pageURL
   $.ajax({
     url: pageURL + "myIp",
     type: "GET",
@@ -264,8 +266,9 @@ function broadcast_ip_addr()
               url = pageURL + "connectBT";
               data = items[i+1];
             }
-            else if(items[i] === "ZIGBEE"){
-              continue;
+            else if(items[i-1] === "ZIGBEE"){
+              url = pageURL + "connectZigbee";
+              data = items[i];
             }
             else{
               url = "http://" + items[i] + ":2080/broadcastRx";
@@ -278,7 +281,8 @@ function broadcast_ip_addr()
               data: data,
               timeout: 250,
               success: function(response){
-                console.log(response);
+                console.log(data);
+                document.getElementsByClassName("broadcast-ip")[0].classList.remove("disabled_button");
               },
               error: function(err){
                 console.log(err);

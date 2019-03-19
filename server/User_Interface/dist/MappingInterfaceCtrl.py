@@ -66,7 +66,12 @@ class MappingInterfaceCtrl:
                 for dest in dest_name:
                     old_name, action = dest.split("|")
                     if old_name in mapping and not old_name == '.' :
-                        map = mapping[1] + "|" + action
+                        if(mapping[1] == "BLUETOOTH"):
+                            map = mapping[0] + "|" + "BLUETOOTH" + "|" + mapping[2] + "|" + action
+                        elif(mapping[1] == "ZIGBEE"):
+                            map = mapping[2] + "|" + "ZIGBEE" + "|" + action
+                        else:
+                            map = mapping[1] + "|" + action
                         mapped_addresses.append(map)
         return mapped_addresses
 
@@ -124,7 +129,8 @@ def main():
             mapDevices = MappingInterfaceCtrl("./dist/devices.csv")
             # We defaulted to create the mapping reader, must make an action reader here
             contents = sys.argv[3]
-            s_ip, s_act = contents.split("|")
+            s_ip, s_gest, s_action = contents.split("|")
+            s_act = s_gest.upper() + "-" + s_action.upper()
             s_name = mapDevices.get_mapped_address(s_ip)
             if(s_name):
                 dest_addrs = mapCont.get_mapped_actions(s_name, s_act)

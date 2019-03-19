@@ -51,7 +51,7 @@ class Camera:
         self._framerate = camera_params["fps"]
         self._camera = PiCamera(resolution=self._resolution, framerate=self._framerate)
         self._pic_out_dir = './' + outdir + '/' + pic_out_dir
-        self._rawCapture = PiRGBArray(self._camera, size=(self._true_resolution[0], self._true_resolution[1]))
+        self._rawCapture = PiRGBArray(self._camera, size=(self._resolution[0], self._resolution[1]))
         # camera module needs some time twarm up after init
         time.sleep(2)
 

@@ -8,7 +8,7 @@ git clone https://github.com/respeaker/seeed-voicecard.git
 cd seeed-voicecard/
 sudo ./install.sh
 sudo reboot
-sudo apt install -y mpg123 portaudio19-dev pocketsphinx python-pocketsphinx libpuse-dev
+sudo apt install -y mpg123 portaudio19-dev pocketsphinx python-pocketsphinx libpulse-dev
 sudo pip3 install pyaudio webrtcvad pocketsphinx respeaker
 ```
 
