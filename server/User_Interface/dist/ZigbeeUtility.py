@@ -24,6 +24,7 @@ def getApiKey(ip):
         data = response.json()
         if 'success' in data[0]:
             print(data[0]['success']['username'])
+            return data[0]['success']['username']
     return None
 
 def getAllLights(ip, key):
@@ -74,39 +75,23 @@ if __name__ == '__main__':
     print(lights)
 
     for light in lights:
-        print(light["id"])
-        turnOnLight(ip, key, light["id"])
+        print(light[2])
+        turnOnLight(ip, key, light[2])
 
     time.sleep(2)
 
     for light in lights:
-        print(light["id"])
-        turnOffLight(ip, key, light["id"])
+        print(light[2])
+        turnOffLight(ip, key, light[2])
+
+    time.sleep(2)
 
     for light in lights:
-        print(light["id"])
-        dimLight(ip, key, light["id"], 100, 30)
+        print(light[2])
+        dimLight(ip, key, light[2], 100, 30)
 
     time.sleep(3)
 
     for light in lights:
-        print(light["id"])
-        dimLight(ip, key, light["id"], 50, 30)
-
-    time.sleep(3)
-
-    for light in lights:
-        print(light["id"])
-        dimLight(ip, key, light["id"], 100, 30)
-
-    time.sleep(3)
-
-    for light in lights:
-        print(light["id"])
-        dimLight(ip, key, light["id"], 0, 30)
-
-    time.sleep(3)
-
-    for light in lights:
-        print(light["id"])
-        turnOffLight(ip, key, light["id"])
+        print(light[2])
+        turnOffLight(ip, key, light[2])
