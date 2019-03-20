@@ -134,7 +134,7 @@ def processing_func(fulres, tasks, args):
             except Exception:
                 print(gesture)
             args["active"] = None
-    tasks.put(api.CameraWorkerTask(foreground,
+    tasks.put(api.CameraWorkerTask(fulres,
                                    img_processor=show_camera_output,
                                    object_centroid=object_centroid,
                                    all_centroids=all_centroids,

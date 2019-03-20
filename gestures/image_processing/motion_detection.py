@@ -39,14 +39,13 @@ class MotionDetection:
     def get_full_contours(current_frame, subtractor, downresScale):
         foreground = MotionDetection.remove_background(
             current_frame, subtractor)
-        kernel = np.ones((5,5),np.uint8)
-        foreground = cv2.erode(foreground,kernel,iterations=1)
-        foreground = cv2.dilate(foreground,kernel,iterations=2)
+        # kernel = np.ones((5,5),np.uint8)
+        # foreground = cv2.erode(foreground,kernel,iterations=1)
+        # foreground = cv2.dilate(foreground,kernel,iterations=2)
 
         # output = MotionDetection.channel_image(foreground, 0)
 
-        contours = cv2.findContours(
-            foreground.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[1]
+        contours = cv2.findContours(foreground, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[1]
         filtered_cntrs = []
         if len(contours) > 0:
             for i in range(0, len(contours)):
@@ -66,15 +65,6 @@ class MotionDetection:
 
     @staticmethod
     def centroid_from_contours(contours):
-        # x_sum = 0
-        # y_sum = 0
-        # count = 0
-        # for c in contours:
-        #     count += c.shape[0]
-        #     vextex_sum = np.sum(c, axis=0)
-        #     x_sum += vextex_sum[0, 0]
-        #     y_sum += vextex_sum[0, 1]
-        # return int(x_sum / count), int(y_sum / count)
         min_y = 1000
         x = 0
         for c in contours:
@@ -110,12 +100,9 @@ class MotionDetection:
         if len(centroids[0][0]) < 1:
             return
         for i in range(1, len(centroids[0][0])):
-            # previous = (int(centroids[0][0][i - 1]*width),
-            #             int(centroids[0][1][i - 1]*height))
             current = (int(centroids[0][0][i]*width),
                        int(centroids[0][1][i]*height))
             cv2.circle(frame, current, 5, (0,255,0), thickness=5)
-            # cv2.line(frame, previous, current, color, int(np.ceil(height/150)))
 
     @staticmethod
     def process_image_contours(frame, subtractor, downresScale):
@@ -155,7 +142,6 @@ class MotionDetection:
                 h = frame.shape[0]
                 w = frame.shape[1]
                 out = np.ones((h*dimension, w*dimension, 3)) * 255
-
             row = int(np.floor(i / dimension))
             column = i % dimension
             out[row*h:(row+1)*h, column*w:(column+1)*w, :] = frame
@@ -181,23 +167,20 @@ class MotionDetection:
             y = np.concatenate((centroids[0][1], np.array([centroid[1]])))
             centroids = np.array([[x, y]])
             count = timeout
-            print("valid centroid")
         else:
-            print("invalid centroid")
             count -= 1
         return count, centroids, avg_centroid_distance
     
     @staticmethod
     def filter_centroids(centroids, start_dropout, end_dropout):
         length = len(centroids[0][0])
-        backElementToRemove = int(np.floor(length * start_dropout))
-        frontElementToRemove = int(np.floor(length * end_dropout))
-        print(length, backElementToRemove, frontElementToRemove)
-        centroids[0,0,0:backElementToRemove + 1] = np.average(centroids[0][0])
-        centroids[0,0,length - frontElementToRemove : length] = np.average(centroids[0][0])
-        centroids[0,1,0:backElementToRemove+1] = np.average(centroids[0][1])
-        centroids[0,1,length - frontElementToRemove : length] = np.average(centroids[0][1])
-        return centroids[0][0], centroids[0][1]
+        # backElementToRemove = int(np.floor(length * start_dropout))
+        # frontElementToRemove = int(np.floor(length * end_dropout))
+        # centroids[0,0,0:backElementToRemove + 1] = np.average(centroids[0][0])
+        # centroids[0,0,length - frontElementToRemove : length] = np.average(centroids[0][0])
+        # centroids[0,1,0:backElementToRemove+1] = np.average(centroids[0][1])
+        # centroids[0,1,length - frontElementToRemove : length] = np.average(centroids[0][1])
+        return centroids[0][0][1:length-2], centroids[0][1][1:length-2]
 
     @staticmethod
     def test_path(centroids, count, timeout, max_len, min_len, min_centroid_count, start_dropout, end_dropout, avg_centroid_distance):
@@ -214,10 +197,27 @@ class MotionDetection:
                 delta_x = np.max(x) - np.min(x)
                 delta_y = np.max(y) - np.min(y)
                 distance_travelled = np.sqrt(delta_x**2 + delta_y**2)
-                print(x, y)
                 if distance_travelled > min_len:
-                    min_index = np.where(x==np.min(x))[0][0]
-                    max_index = np.where(x==np.max(x))[0][0]
+                    x_max = np.max(x)
+                    x_min = np.min(x)
+                    y_max = np.max(y)
+                    y_min = np.min(y)
+
+                    x_min_index = np.where(x==x_min)[0][0]
+                    x_max_index = np.where(x==x_max)[0][0]
+                    y_min_index = np.where(y==y_min)[0][0]
+                    y_max_index = np.where(y==y_max)[0][0]
+                    
+                    x_range = x_max - x_min
+                    y_range = y_max - y_min
+
+                    if x_range >= y_range:
+                        min_index = x_min_index
+                        max_index = x_max_index
+                    else:
+                        min_index = y_min_index
+                        max_index = y_max_index
+
                     x_1 = x[np.min((min_index, max_index))]
                     x_2 = x[np.max((min_index, max_index))]
                     z = np.polyfit(x,y,1)
