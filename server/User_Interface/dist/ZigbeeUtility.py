@@ -23,7 +23,6 @@ def getApiKey(ip):
     if response is not None:
         data = response.json()
         if 'success' in data[0]:
-            print(data[0]['success']['username'])
             return data[0]['success']['username']
     return None
 
@@ -32,7 +31,6 @@ def getAllLights(ip, key):
     response = requests.get(url)
     if response is not None:
         data = response.json()
-        print(data)
         lights = []
         for light in data:
             lights.append([data[str(light)]["name"], "ZIGBEE", light, data[str(light)]["manufacturername"]])
@@ -45,7 +43,6 @@ def turnOnLight(ip, key, id):
     response = requests.put(url, headers={'content-type': 'raw'}, data=raw_data, timeout=2)
     if response is not None:
         data = response.json()
-        print(data)
 
 def turnOffLight(ip, key, id):
     url = "http://{}:8080{}/{}{}/{}/{}".format(ip, eps["getApi"], key, eps["getLights"], id, eps["setLights"])
@@ -53,7 +50,6 @@ def turnOffLight(ip, key, id):
     response = requests.put(url, headers={'content-type': 'raw'}, data=raw_data, timeout=2)
     if response is not None:
         data = response.json()
-        print(data)
 
 def dimLight(ip, key, id, brightness, transition_time):
     url = "http://{}:8080{}/{}{}/{}/{}".format(ip, eps["getApi"], key, eps["getLights"], id, eps["setLights"])
@@ -61,7 +57,6 @@ def dimLight(ip, key, id, brightness, transition_time):
     response = requests.put(url, headers={'content-type': 'raw'}, data=raw_data, timeout=2)
     if response is not None:
         data = response.json()
-        print(data)
 
 def changeLightColor(ip, key, id, brightness, sat, hue, transition_time):
     url = "http://{}:8080{}/{}{}/{}/{}".format(ip, eps["getApi"], key, eps["getLights"], id, eps["setLights"])
@@ -69,7 +64,6 @@ def changeLightColor(ip, key, id, brightness, sat, hue, transition_time):
     response = requests.put(url, headers={'content-type': 'raw'}, data=raw_data, timeout=2)
     if response is not None:
         data = response.json()
-        print(data)
 
 if __name__ == '__main__':
     ip = "192.168.43.80"
