@@ -39,11 +39,12 @@ class MotionDetection:
     def get_full_contours(current_frame, subtractor, downresScale):
         foreground = MotionDetection.remove_background(
             current_frame, subtractor)
-        # kernel = np.ones((5,5),np.uint8)
-        # foreground = cv2.erode(foreground,kernel,iterations=1)
-        # foreground = cv2.dilate(foreground,kernel,iterations=2)
+        kernel = np.ones((5,5),np.uint8)
+        foreground = cv2.erode(foreground,kernel,iterations=1)
+        foreground = cv2.dilate(foreground,kernel,iterations=2)
 
         # output = MotionDetection.channel_image(foreground, 0)
+        # output = current_frame.copy()
 
         contours = cv2.findContours(foreground, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[1]
         filtered_cntrs = []
@@ -59,10 +60,16 @@ class MotionDetection:
             c = MotionDetection.centroid_from_contours(filtered_cntrs)
             x = c[0]/width
             y = c[1]/height
+        
+        for cntr in filtered_cntrs:
+            rect = cv2.minAreaRect(cntr)
+            box = cv2.boxPoints(rect)
+            box = np.int0(box)
+            cv2.drawContours(current_frame,[box], 0,(0,0,255), 1)
+            # cv2.drawContours(output,[box], 0,(0,0,255), 1)
 
-        # cv2.drawContours(output, filtered_cntrs, -1, (0, 255, 0), 1)
-        # return output, (x, y)
-        return (x,y)
+        # cv2.drawContours(current_frame, filtered_cntrs, -1, (0, 255, 0), 1)
+        return current_frame, (x, y)
 
     @staticmethod
     def centroid_from_contours(contours):
@@ -103,7 +110,7 @@ class MotionDetection:
         for i in range(1, len(centroids[0][0])):
             current = (int(centroids[0][0][i]*width),
                        int(centroids[0][1][i]*height))
-            cv2.circle(frame, current, 5, (0,255,0), thickness=5)
+            cv2.circle(frame, current, 2, (0,255,0), thickness=1)
 
     @staticmethod
     def process_image_contours(frame, subtractor, downresScale):

@@ -45,10 +45,11 @@ while True:
     frame = fulres
     frame = md.downResImage(fulres, downresScale)
 
-    object_centroid = md.process_image_contours(
+    foreground, object_centroid = md.process_image_contours(
         frame, bgSubtractor, downresScale)
 
-    frame_output = fulres.copy()
+    # frame_output = fulres.copy()
+    frame_output = foreground
 
     count, all_centroids, avg_centroid_distance = md.add_centroid(
         all_centroids, object_centroid, count, params[mdp.timeout], avg_centroid_distance)
