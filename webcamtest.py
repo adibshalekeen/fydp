@@ -36,6 +36,7 @@ params = {
     mdp.path_encoding: None
 }
 selected_parameter = mdp.timeout
+fitted_line_to_draw = None
 
 while True:
     stime = time.time()
@@ -43,7 +44,7 @@ while True:
     frame = fulres
     frame = md.downResImage(fulres, downresScale)
 
-    foreground, object_centroid = md.process_image_contours(
+    object_centroid = md.process_image_contours(
         frame, bgSubtractor, downresScale)
 
     frame_output = fulres.copy()
@@ -65,14 +66,19 @@ while True:
     frame_output = md.add_frame_centroid(object_centroid, frame_output, (255, 255, 255))
 
     md.add_frame_path_centroid(all_centroids, frame_output, (255, 255, 255))
-    md.draw_fitted_path(frame_output, fitted_line)
-    # output = md.make_visual_output(True, frame_output, foreground)
+
+    if (fitted_line[0] is not None):
+        fitted_line_to_draw = fitted_line
+        # gesture = mdp.gesture_map[params[mdp.path_encoding]]
+        print(gesture)
+    if fitted_line_to_draw is not None:
+        md.draw_fitted_path(frame_output, fitted_line_to_draw)
+        params[mdp.path], params[mdp.angle], params[mdp.path_encoding] = md.get_fitted_path_stat(frame_output, fitted_line_to_draw)
+
     output = md.make_visual_output(True, frame_output)
     md.showconfig(output, selected_parameter, params)
     cv2.imshow("output", output.astype(np.uint8))
-    if (fitted_line[0] is not None):
-        params[mdp.path], params[mdp.angle], params[mdp.path_encoding] = md.get_fitted_path_stat(frame_output, fitted_line)
-        print(params[mdp.path_encoding])
+
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):
         break
