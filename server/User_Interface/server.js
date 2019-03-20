@@ -167,55 +167,46 @@ function hub_point_message(req, res){
         var routed_msg = resp.toString().split(',');
 
         for(var i = 0; i < routed_msg.length; i++){
-          var dest_addr = "";
           var dest_act = "";
-          var dest_name = "";
           var second_field = routed_msg[i].split('|')[1];
+          var host = "localhost";
+          var path = "";
 
           if(second_field != "BLUETOOTH" && second_field != "ZIGBEE"){
-            continue;
-            // handle the http calls
+            dest_act = routed_msg[i];
+            path = "/tvControl";
+            host = routed_msg[i].split("|")[0];
           }
-          else{
-            var path = "";
-            var host = "localhost";
-            if(routed_msg[i].includes("TVSOURCE"))
-            {
-                console.log(routed_msg[i] + "at the message");
-                path = "/tvControl";
-                host = "192.168.43.80";
-            }
-            else
-            {
-                dest_act = routed_msg[i].replace("BLUETOOTH|", "");
-                dest_act = dest_act.replace("ZIGBEE|", "");
+          else
+          {
+            dest_act = routed_msg[i].replace("BLUETOOTH|", "");
+            dest_act = dest_act.replace("ZIGBEE|", "");
 
-                path = (second_field === "BLUETOOTH") ? "/btSongAction" : "/zigbeeAction";
-            }
-            // host is the destination of the message and port number is set to our default
-            // If we are to send to a third party manufacturer we will have pre-defined settings
-            // and will set them here
-            var post_options = {
-                host: host, //dest_ip
-                port: portNum,
-                path: path,
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Content-Length': dest_act.length
-                }
-            };
-            // Set up the request
-            var post_req = http.request(post_options, function(res) {
-                res.setEncoding('utf8');
-                res.on('data', function (chunk) {
-                    console.log('Response: ' + chunk);
-                });
-            });
-            // post the data
-            post_req.write(dest_act);
-            post_req.end();
+            path = (second_field === "BLUETOOTH") ? "/btSongAction" : "/zigbeeAction";
           }
+          // host is the destination of the message and port number is set to our default
+          // If we are to send to a third party manufacturer we will have pre-defined settings
+          // and will set them here
+          var post_options = {
+              host: host, //dest_ip
+              port: portNum,
+              path: path,
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                  'Content-Length': dest_act.length
+              }
+          };
+          // Set up the request
+          var post_req = http.request(post_options, function(res) {
+              res.setEncoding('utf8');
+              res.on('data', function (chunk) {
+                  console.log('Response: ' + chunk);
+              });
+          });
+          // post the data
+          post_req.write(dest_act);
+          post_req.end();
         }
       }
     })
@@ -301,6 +292,8 @@ function connect_bt(req, res){
       let options = {
         args: ['connect', bt_mac]
       };
+      console.log(options);
+
       ps.PythonShell.run('./dist/handle_bluetooth_actions.py', options, function (err, results) {
         if (err) throw err;
         // results is an array consisting of messages collected during execution
@@ -428,14 +421,14 @@ function tv_control(req, res){
   });
   req.on('end', function () {
     var sourceNum = source.split("-")[1];
-    console.log(sourceNum);
     let options = {
       args: ["changesource", sourceNum]
     };
+    console.log(options);
 
     ps.PythonShell.run('./dist/CecCommands.py', options, function (err, results) {
       if (err) throw err;
-      res.send("Done");
+      res.send("tv_control Done: " + results);
     });
   });
 }
