@@ -16,6 +16,7 @@ http_params = {'gesture': None}
 LIBRARY_PATH =  './audio_processing/libpv_porcupine.so'
 MODEL_FILE_PATH = './audio_processing/porcupine_params.pv'
 KEYWORD_FILE_PATHS = ['./audio_processing/keyword_files/bumblebee_raspberrypi.ppn', './audio_processing/keyword_files/grapefruit_raspberrypi.ppn']
+# KEYWORD_FILE_PATHS = ['./audio_processing/keyword_files/kitchen_linux.ppn', './audio_processing/keyword_files/bedroom_linux.ppn']
 
 camera_params = {
     "res":[640, 480],
@@ -87,17 +88,15 @@ def processing_func(fulres, tasks, args):
     params = args["params"]
     selected_param = args["selected_param"]
 
-    # if args["cooldown"]:
-    #     tasks.put(api.CameraWorkerTask(fulres,
-    #                                img_processor=None))
-    #     if params[MotionDetectionParameter.gesture_cooldown] > 0:
-    #         params[MotionDetectionParameter.gesture_cooldown] -= 1
-    #         return all_centroids, count, params, selected_param
-    #     else:
-    #         params[MotionDetectionParameter.gesture_cooldown] = 10
-    #         args["cooldown"] = False
-
     if args["active"] is None:
+
+        encoding = params[MotionDetectionParameter.path_encoding]
+        if encoding is not None:
+            MotionDetection.remove_background(fulres, bgSubtractor)
+            gesture = MotionDetectionParameter.gesture_map[encoding]
+            font_size = fulres.shape[0]/750
+            cv2.putText(fulres, "Gesture" + ": " + gesture,
+                                (40, 100), cv2.FONT_HERSHEY_SIMPLEX, font_size, (0,255,0), 1)
         tasks.put(api.CameraWorkerTask(fulres, img_processor=None))
         return all_centroids, count, params, selected_param, avg_centroid_distance
 
@@ -135,7 +134,7 @@ def processing_func(fulres, tasks, args):
             except Exception:
                 print(gesture)
             args["active"] = None
-    tasks.put(api.CameraWorkerTask(fulres,
+    tasks.put(api.CameraWorkerTask(foreground,
                                    img_processor=show_camera_output,
                                    object_centroid=object_centroid,
                                    all_centroids=all_centroids,

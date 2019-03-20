@@ -50,7 +50,7 @@ class MotionDetection:
         filtered_cntrs = []
         if len(contours) > 0:
             for i in range(0, len(contours)):
-                if cv2.contourArea(contours[i]) > (20 / (2 ** (downresScale + 2))):
+                if cv2.contourArea(contours[i]) > (1000 / (2 ** (downresScale + 2))):
                     filtered_cntrs.append(contours[i])
         x = 0
         y = 0
@@ -110,12 +110,12 @@ class MotionDetection:
         if len(centroids[0][0]) < 1:
             return
         for i in range(1, len(centroids[0][0])):
-            previous = (int(centroids[0][0][i - 1]*width),
-                        int(centroids[0][1][i - 1]*height))
+            # previous = (int(centroids[0][0][i - 1]*width),
+            #             int(centroids[0][1][i - 1]*height))
             current = (int(centroids[0][0][i]*width),
                        int(centroids[0][1][i]*height))
-            cv2.line(frame, previous, current, color, int(np.ceil(height/150)))
-            cv2.circle(frame, current, 3, (255,0,0), int(np.ceil(height/150)))
+            cv2.circle(frame, current, 5, (0,255,0), thickness=5)
+            # cv2.line(frame, previous, current, color, int(np.ceil(height/150)))
 
     @staticmethod
     def process_image_contours(frame, subtractor, downresScale):
