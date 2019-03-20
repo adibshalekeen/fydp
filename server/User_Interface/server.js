@@ -42,6 +42,7 @@ app.post('/connectBT', connect_bt);
 app.post('/btSongAction', bt_song_action);
 app.post('/connectZigbee', connect_zigbee);
 app.post('/zigbeeAction', zigbee_action);
+app.post('/tvControl', tv_control);
 
 
 /*START GET REQUESTS*/
@@ -175,11 +176,19 @@ function hub_point_message(req, res){
             // handle the http calls
           }
           else{
-            dest_act = routed_msg[i].replace("BLUETOOTH|", "");
-            dest_act = dest_act.replace("ZIGBEE|", "");
-            console.log(dest_act + "hubPtMessage");
+            var path = "";
+            if(routed_msg[i].includes("TVSOURCE"))
+            {
+                path = "/tvControl";
 
-            var path = (second_field === "BLUETOOTH") ? "/btSongAction" : "/zigbeeAction";
+            }
+            else
+            {
+                dest_act = routed_msg[i].replace("BLUETOOTH|", "");
+                dest_act = dest_act.replace("ZIGBEE|", "");
+
+                path = (second_field === "BLUETOOTH") ? "/btSongAction" : "/zigbeeAction";
+            }
             // host is the destination of the message and port number is set to our default
             // If we are to send to a third party manufacturer we will have pre-defined settings
             // and will set them here
@@ -406,6 +415,25 @@ function zigbee_action(req, res){
       res.send(results_inr);
     });
   });
+}
+
+// incoming dest|ip
+function tv_control(req, res){
+  var source = "";
+  req.on('data', function (data) {
+      source += data;
+  });
+  req.on('end', function () {
+    var sourceNum = source.split("-")[1];
+    let options = {
+      args: ["changesource", sourceNum]
+    };
+
+    ps.PythonShell.run('./dist/CecCommands.py', options, function (err, results) {
+      if (err) throw err;
+      res.send("Done");
+    });
+  }
 }
 /*END POST REQUESTS*/
 
