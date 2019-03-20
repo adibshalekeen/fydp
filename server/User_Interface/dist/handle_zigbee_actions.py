@@ -30,18 +30,18 @@ def main():
             try:
                 # The hsv is on 0-360 gradient
                 color = sys.argv[5]
-                if color == "blue":
-                    color = 240;
-                elif color == "red":
-                    color = 351;
-                elif color == "green":
-                    color = 90;
-                elif color == "yellow":
-                    color = 58;
-                elif color == "orange":
-                    color = 33;
+                if color == "BLUE":
+                    color = 46920;
+                elif color == "RED":
+                    color = 0;
+                elif color == "GREEN":
+                    color = 25500;
+                elif color == "YELLOW":
+                    color = 10916;
+                elif color == "ORANGE":
+                    color = 5808;
                 #ZU.changeLightColor(ip, key, id, brightness, sat, hue, transition_time)
-                ZU.changeLightColor(sys.argv[2], sys.argv[3], sys.argv[4], 100, 255, color, 30)
+                ZU.changeLightColor(sys.argv[2], sys.argv[3], sys.argv[4], 255, 255, color, 10)
             except:
                 print("Failed to change light color")
 
