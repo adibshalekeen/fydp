@@ -69,8 +69,8 @@ while True:
 
     if (fitted_line[0] is not None):
         fitted_line_to_draw = fitted_line
-        gesture = mdp.gesture_map[params[mdp.path_encoding]]
-        print(gesture)
+        # gesture = mdp.gesture_map[params[mdp.path_encoding]]
+        # print(gesture)
     if fitted_line_to_draw is not None:
         md.draw_fitted_path(frame_output, fitted_line_to_draw)
         params[mdp.path], params[mdp.angle], params[mdp.path_encoding] = md.get_fitted_path_stat(frame_output, fitted_line_to_draw)
