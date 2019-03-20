@@ -433,7 +433,7 @@ function tv_control(req, res){
       if (err) throw err;
       res.send("Done");
     });
-  }
+  });
 }
 /*END POST REQUESTS*/
 
