@@ -181,9 +181,7 @@ class MotionDetection:
             y = np.concatenate((centroids[0][1], np.array([centroid[1]])))
             centroids = np.array([[x, y]])
             count = timeout
-            print("valid centroid")
         else:
-            print("invalid centroid")
             count -= 1
         return count, centroids, avg_centroid_distance
     
@@ -192,7 +190,6 @@ class MotionDetection:
         length = len(centroids[0][0])
         backElementToRemove = int(np.floor(length * start_dropout))
         frontElementToRemove = int(np.floor(length * end_dropout))
-        print(length, backElementToRemove, frontElementToRemove)
         centroids[0,0,0:backElementToRemove + 1] = np.average(centroids[0][0])
         centroids[0,0,length - frontElementToRemove : length] = np.average(centroids[0][0])
         centroids[0,1,0:backElementToRemove+1] = np.average(centroids[0][1])
@@ -214,7 +211,6 @@ class MotionDetection:
                 delta_x = np.max(x) - np.min(x)
                 delta_y = np.max(y) - np.min(y)
                 distance_travelled = np.sqrt(delta_x**2 + delta_y**2)
-                print(x, y)
                 if distance_travelled > min_len:
                     min_index = np.where(x==np.min(x))[0][0]
                     max_index = np.where(x==np.max(x))[0][0]
