@@ -100,6 +100,7 @@ function send_message(req, res) {
       message += data;
   });
   req.on('end', function () {
+    res.send("Gotchya");
     var options = {
       host: 'localhost',
       port: portNum,
@@ -177,10 +178,12 @@ function hub_point_message(req, res){
           }
           else{
             var path = "";
+            var host = "localhost";
             if(routed_msg[i].includes("TVSOURCE"))
             {
+                console.log(routed_msg[i] + "at the message");
                 path = "/tvControl";
-
+                host = "192.168.43.80";
             }
             else
             {
@@ -193,7 +196,7 @@ function hub_point_message(req, res){
             // If we are to send to a third party manufacturer we will have pre-defined settings
             // and will set them here
             var post_options = {
-                host: "localhost", //dest_ip
+                host: host, //dest_ip
                 port: portNum,
                 path: path,
                 method: 'POST',
@@ -425,6 +428,7 @@ function tv_control(req, res){
   });
   req.on('end', function () {
     var sourceNum = source.split("-")[1];
+    console.log(sourceNum);
     let options = {
       args: ["changesource", sourceNum]
     };
