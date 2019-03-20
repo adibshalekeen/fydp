@@ -37,6 +37,7 @@ params = {
 }
 selected_parameter = mdp.timeout
 fitted_line_to_draw = None
+gesture = None
 
 while True:
     stime = time.time()
@@ -69,14 +70,19 @@ while True:
 
     if (fitted_line[0] is not None):
         fitted_line_to_draw = fitted_line
-        # gesture = mdp.gesture_map[params[mdp.path_encoding]]
-        # print(gesture)
+        params[mdp.path], params[mdp.angle], params[mdp.path_encoding] = md.get_fitted_path_stat(frame_output, fitted_line)
+        gesture = mdp.gesture_map[params[mdp.path_encoding]]
+        print(gesture)
     if fitted_line_to_draw is not None:
         md.draw_fitted_path(frame_output, fitted_line_to_draw)
         params[mdp.path], params[mdp.angle], params[mdp.path_encoding] = md.get_fitted_path_stat(frame_output, fitted_line_to_draw)
 
     output = md.make_visual_output(True, frame_output)
-    md.showconfig(output, selected_parameter, params)
+    # md.showconfig(output, selected_parameter, pa
+    if gesture is not None:
+        color = (0,255,0)
+        cv2.putText(output, gesture, (50,100), cv2.FONT_HERSHEY_SIMPLEX, 2, color, thickness=3)
+    cv2.namedWindow("output",cv2.WND_PROP_FULLSCREEN)
     cv2.imshow("output", output.astype(np.uint8))
 
     key = cv2.waitKey(1) & 0xFF
