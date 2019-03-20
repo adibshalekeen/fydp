@@ -43,7 +43,7 @@ class MotionDetection:
         # foreground = cv2.erode(foreground,kernel,iterations=1)
         # foreground = cv2.dilate(foreground,kernel,iterations=2)
 
-        # output = MotionDetection.channel_image(foreground, 0)
+        output = MotionDetection.channel_image(foreground, 0)
 
         contours = cv2.findContours(foreground, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[1]
         filtered_cntrs = []
@@ -60,8 +60,8 @@ class MotionDetection:
             x = c[0]/width
             y = c[1]/height
 
-        # cv2.drawContours(output, filtered_cntrs, -1, (0, 255, 0), 1)
-        return (x, y)
+        cv2.drawContours(output, filtered_cntrs, -1, (0, 255, 0), 1)
+        return output, (x, y)
 
     @staticmethod
     def centroid_from_contours(contours):
@@ -225,7 +225,7 @@ class MotionDetection:
                     y_2 = z[0]*x_2 + z[1]
                     point1 = (x_1, y_1)
                     point2 = (x_2, y_2)
-            return timeout, np.array([[[], []]]), (point1, point2), avg_centroid_distance
+            return timeout, np.array([[[], []]]), (point1, point2), None
         return count, centroids, (point2, point1), avg_centroid_distance
 
     @staticmethod

@@ -1,4 +1,5 @@
 from gestures import image_processing
+from imutils.video import VideoStream
 import argparse
 import datetime
 import imutils
@@ -9,10 +10,14 @@ import numpy as np
 
 downresScale = 3
 
-vs = cv2.VideoCapture(0)
+vs = VideoStream(src=0).start()
 time.sleep(2.0)
 
 all_centroids = np.array([[[], []]])
+avg_centroid_distance = None
+start_dropout = 0.15
+end_dropout = 0
+
 count = 10
 
 bgSubtractor = cv2.createBackgroundSubtractorMOG2(history=1)
@@ -24,7 +29,8 @@ params = {
     mdp.fps: 0,
     mdp.timeout: 10,
     mdp.max_len: 70,
-    mdp.min_len: 2,
+    mdp.min_len: 0.25,
+    mdp.min_centroid_count: 10,
     mdp.path: (None, None),
     mdp.angle: None,
     mdp.path_encoding: None
@@ -33,7 +39,7 @@ selected_parameter = mdp.timeout
 
 while True:
     stime = time.time()
-    fulres = vs.read()[1]
+    fulres = vs.read()
     frame = fulres
     frame = md.downResImage(fulres, downresScale)
 
@@ -42,19 +48,26 @@ while True:
 
     frame_output = fulres.copy()
 
-    count, all_centroids = md.add_centroid(
-        all_centroids, object_centroid, count, params[mdp.timeout])
+    count, all_centroids, avg_centroid_distance = md.add_centroid(
+        all_centroids, object_centroid, count, params[mdp.timeout], avg_centroid_distance)
 
-    count, all_centroids, fitted_line = md.test_path(
+    count, all_centroids, fitted_line, avg_centroid_distance = md.test_path(
         all_centroids,
-        count, params[mdp.timeout],
+        count, 
+        params[mdp.timeout],
         params[mdp.max_len],
-        params[mdp.min_len])
-    frame_output = md.add_frame_centroid(
-        object_centroid, frame_output, (255, 255, 255))
+        params[mdp.min_len], 
+        params[mdp.min_centroid_count],
+        start_dropout,
+        end_dropout,
+        avg_centroid_distance)
+
+    frame_output = md.add_frame_centroid(object_centroid, frame_output, (255, 255, 255))
+
     md.add_frame_path_centroid(all_centroids, frame_output, (255, 255, 255))
     md.draw_fitted_path(frame_output, fitted_line)
-    output = md.make_visual_output(True, frame_output, foreground)
+    # output = md.make_visual_output(True, frame_output, foreground)
+    output = md.make_visual_output(True, frame_output)
     md.showconfig(output, selected_parameter, params)
     cv2.imshow("output", output.astype(np.uint8))
     if (fitted_line[0] is not None):
@@ -78,5 +91,5 @@ while True:
     # print('FPS {:.1f}'.format(1 / (time.time() - stime)))
 
 # cleanup the camera and close any open windows
-vs.release()
+vs.stop()
 cv2.destroyAllWindows()
